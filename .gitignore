@@ -36,9 +36,8 @@ media/
 ml-service/**/models/*
 !ml-service/**/models/.gitkeep
 
-# --- Uploaded media (keep folder via .gitkeep, ignore contents) ---
-server/uploads/**
-!server/uploads/**/.gitkeep
+# --- Uploaded media (created at runtime by server/src/middleware/upload.js) ---
+server/uploads/
 
 # --- OS / editor ---
 .DS_Store
