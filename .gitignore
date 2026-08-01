@@ -32,8 +32,13 @@ media/
 *.h5
 *.pkl
 *.joblib
-ml-service/**/models/*.h5
-ml-service/**/models/*.pkl
+*.keras
+ml-service/**/models/*
+!ml-service/**/models/.gitkeep
+
+# --- Uploaded media (keep folder via .gitkeep, ignore contents) ---
+server/uploads/**
+!server/uploads/**/.gitkeep
 
 # --- OS / editor ---
 .DS_Store
