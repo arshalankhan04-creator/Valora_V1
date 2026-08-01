@@ -1,0 +1,46 @@
+# --- Environment / secrets ---
+.env
+.env.local
+.env.*.local
+*/.env
+*/.env.local
+
+# --- Node (client/, server/) ---
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vite/
+
+# --- Python (ml-service/) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+*.sqlite3
+staticfiles/
+media/
+
+# --- ML model artifacts (large binaries, don't commit trained weights) ---
+*.h5
+*.pkl
+*.joblib
+ml-service/**/models/*.h5
+ml-service/**/models/*.pkl
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Logs ---
+logs/
+*.log
