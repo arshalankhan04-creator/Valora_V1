@@ -74,11 +74,47 @@ this writing; `condition_assessment` is trained but proof-of-concept scale
 only — 63 images across 8 damage/part classes, expect low recall until a
 larger dataset is collected.
 
+## Testing
+
+### server
+```bash
+cd server
+cp .env.test.example .env.test   # separate DB from your dev data — see tests/setup.js
+npm test
+```
+Vitest + Supertest, hitting a real Express app instance against a dedicated
+`valora_v1_test` MongoDB database (cleared between every test). ML service
+calls are mocked (`vi.mock('../src/services/mlService.js', ...)`), so these
+tests don't need Django running and stay deterministic regardless of model
+quality. Covers auth, listing CRUD/ownership/status-whitelisting, search
+filters, and wishlist idempotency. `npm run test:watch` for watch mode.
+
+### ml-service
+```bash
+cd ml-service
+source venv/Scripts/activate
+python manage.py test
+```
+Django's test runner (SQLite in-memory, no `.env` database needed). Covers
+the trust-score formula against the spec's worked example, the fraud
+preprocessing math (including the zero-width-range edge case), price
+preprocessing's condition-score fallback, and the shared JWT auth class —
+via the trust-score endpoint, since it's the one ML endpoint with no trained
+model to worry about. Model-serving views (`predict-price`, `detect-fraud`,
+`assess-condition`) aren't covered — testing them meaningfully needs a
+trained model artifact per app, which is a separate, larger step (fixture
+models or mocking `inference.predict` per app) than this pass covers.
+
+### client
+Not covered yet — would need a Vitest + Testing Library setup from scratch.
+Deferred as a follow-up; the marketplace flows are covered by the server's
+integration tests plus manual browser verification during development.
+
 ## Git workflow
 
 - `main` — stable only, nothing pushed directly
 - `dev` — integration branch, all work happens here
 - `feature/<name>` branches off `dev`, one per task
 
-See [Valora_Team_Workflow.md](Valora_Team_Workflow.md) §3 for branch naming
-conventions and commit message style.
+See [docs/Valora_Team_Workflow.md](docs/Valora_Team_Workflow.md) §3 for
+branch naming conventions and commit message style.

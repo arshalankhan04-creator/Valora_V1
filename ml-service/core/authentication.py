@@ -31,3 +31,9 @@ class ServiceJWTAuthentication(BaseAuthentication):
             raise AuthenticationFailed('Invalid or expired service token') from exc
 
         return (ServiceUser(payload.get('service', 'unknown')), None)
+
+    def authenticate_header(self, request):
+        # Without this, DRF can't tell a bearer-token scheme is in use and
+        # silently downgrades every AuthenticationFailed to 403 Forbidden
+        # instead of 401 Unauthorized (see APIView.handle_exception).
+        return 'Bearer'
