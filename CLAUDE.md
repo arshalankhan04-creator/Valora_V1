@@ -24,8 +24,10 @@ live in the standing instructions already governing this project).
   four ML endpoints, model inference mocked via `unittest.mock.patch.object`).
 - Light security hardening: helmet, rate-limiting on auth routes, NoSQL
   injection type-guards on every value that reaches a Mongoose query filter.
-- Deployment prep done (render.yaml, vercel.json, production Django config)
-  but deployment itself is on hold — proceed only when explicitly told to.
+- Deployment prep exists (render.yaml, vercel.json, production Django config)
+  but the project stays local + GitHub only, permanently — not "on hold"
+  pending a go-ahead. Don't suggest deployment as a next step; if it ever
+  comes up again, treat it as a brand-new explicit request, not a resumed one.
 
 ### Not building (deliberately out of scope, don't add without discussion)
 - No real-time chat (Socket.io) — inquiries are plain REST, client polls.
