@@ -1,6 +1,11 @@
+import jwt
+from django.conf import settings
 from django.test import SimpleTestCase
+from rest_framework.test import APITestCase
 
 from trust_score.scoring import compute, seller_bonus, MAX_SELLER_BONUS
+
+TRUST_SCORE_URL = '/api/ml/trust-score/'
 
 
 class SellerBonusTests(SimpleTestCase):
@@ -59,3 +64,21 @@ class ComputeTrustScoreTests(SimpleTestCase):
         })
 
         self.assertEqual(result['trust_score'], 0)
+
+
+class TrustScoreViewTests(APITestCase):
+    def test_rejects_an_invalid_payload(self):
+        # price_fairness_score is capped at 100 by the serializer — this is
+        # the view-level validation path, distinct from compute()'s own math.
+        token = jwt.encode({'service': 'valora-node'}, settings.JWT_SECRET, algorithm='HS256')
+        invalid = {
+            'price_fairness_score': 150,
+            'fraud_risk_score': 90,
+            'condition_score': 90,
+            'seller_history': {'response_rate': 90, 'past_deals': 5, 'account_age_days': 100},
+        }
+        res = self.client.post(
+            TRUST_SCORE_URL, invalid, format='json', HTTP_AUTHORIZATION=f'Bearer {token}',
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('price_fairness_score', res.json())

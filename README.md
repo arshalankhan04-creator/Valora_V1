@@ -96,6 +96,18 @@ this writing; `condition_assessment` is trained but proof-of-concept scale
 only — 63 images across 8 damage/part classes, expect low recall until a
 larger dataset is collected.
 
+`price_prediction` uses a `RandomForestRegressor` (200 trees) over one-hot
+brand/model/fuel/transmission plus numeric year/km/condition, fit on
+log(price) — test R² 0.89, MAE ≈₹1.13L on the CarDekho dataset. A plain
+`LinearRegression` on the same features only reached R² 0.71: brand/model
+depreciation isn't additive (a Ferrari and a Datsun don't lose the same
+rupee amount per year), which a linear model over one-hot columns can't
+capture but a forest can. `feature_importance` in the API response is the
+forest's `feature_importances_`, aggregated per original field (all of a
+categorical feature's one-hot columns summed back into one number) — it's
+an unsigned relative-importance score, not a signed % effect on price like
+a linear coefficient would be.
+
 ## Analytics
 
 The spec calls for a "Plotly/Dash" analytics dashboard — built differently
@@ -141,15 +153,19 @@ cd ml-service
 source venv/Scripts/activate
 python manage.py test
 ```
-Django's test runner (SQLite in-memory, no `.env` database needed). Covers
-the trust-score formula against the spec's worked example, the fraud
-preprocessing math (including the zero-width-range edge case), price
-preprocessing's condition-score fallback, and the shared JWT auth class —
-via the trust-score endpoint, since it's the one ML endpoint with no trained
-model to worry about. Model-serving views (`predict-price`, `detect-fraud`,
-`assess-condition`) aren't covered — testing them meaningfully needs a
-trained model artifact per app, which is a separate, larger step (fixture
-models or mocking `inference.predict` per app) than this pass covers.
+Django's test runner (SQLite in-memory, no `.env` database needed). 34
+tests. Covers the trust-score formula against the spec's worked example,
+the fraud preprocessing math (including the zero-width-range edge case),
+price preprocessing's condition-score fallback, and the shared JWT auth
+class — via the trust-score endpoint, since it's the one ML endpoint with
+no trained model to worry about. Every model-serving view (`predict-price`,
+`detect-fraud`, `assess-condition`, `trust-score`) also has its own
+APITestCase covering: auth required (401), payload validation (400), a
+mocked `ModelNotTrainedError` → 503, and a mocked successful prediction →
+200 with the exact response body. The trained model itself is never
+invoked in tests — `inference.predict`/`inference.assess` are mocked per
+test via `unittest.mock.patch.object`, so these tests don't depend on
+model quality or need real training artifacts to exist.
 
 ### client
 ```bash

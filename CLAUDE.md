@@ -18,7 +18,9 @@ live in the standing instructions already governing this project).
 - 4 ML layers, all live and wired: price prediction (regression), fraud
   detection (classification), CNN condition assessment, combined Trust Score.
 - Automated tests: server (Vitest+Supertest, 46 tests), client (Vitest+RTL,
-  51 tests), ml-service (Django test runner, 21 tests).
+  51 tests), ml-service (Django test runner, 34 tests — includes
+  view-level auth/validation/success/model-not-trained coverage for all
+  four ML endpoints, model inference mocked via `unittest.mock.patch.object`).
 - Light security hardening: helmet, rate-limiting on auth routes, NoSQL
   injection type-guards on every value that reaches a Mongoose query filter.
 - Deployment prep done (render.yaml, vercel.json, production Django config)

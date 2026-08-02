@@ -1,6 +1,23 @@
-from django.test import SimpleTestCase
+from unittest.mock import patch
 
+import jwt
+from django.conf import settings
+from django.test import SimpleTestCase
+from rest_framework.test import APITestCase
+
+from fraud_detection import inference
 from fraud_detection.preprocessing import price_deviation_ratio, request_to_features
+
+DETECT_FRAUD_URL = '/api/ml/detect-fraud/'
+
+VALID_PAYLOAD = {
+    'price': 150000,
+    'predicted_price_min': 140000,
+    'predicted_price_max': 160000,
+    'seller_account_age_days': 100,
+    'has_missing_details': False,
+    'num_previous_listings': 3,
+}
 
 
 class PriceDeviationRatioTests(SimpleTestCase):
@@ -52,3 +69,38 @@ class RequestToFeaturesTests(SimpleTestCase):
         })
 
         self.assertEqual(features['has_missing_details'], 0)
+
+
+def auth_header():
+    token = jwt.encode({'service': 'valora-node'}, settings.JWT_SECRET, algorithm='HS256')
+    return f'Bearer {token}'
+
+
+class DetectFraudViewTests(APITestCase):
+    def test_rejects_an_unauthenticated_request(self):
+        res = self.client.post(DETECT_FRAUD_URL, VALID_PAYLOAD, format='json')
+        self.assertEqual(res.status_code, 401)
+
+    def test_rejects_an_invalid_payload(self):
+        invalid = {**VALID_PAYLOAD, 'price': -10}
+        res = self.client.post(
+            DETECT_FRAUD_URL, invalid, format='json', HTTP_AUTHORIZATION=auth_header(),
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('price', res.json())
+
+    def test_returns_503_when_model_is_not_trained(self):
+        with patch.object(inference, 'predict', side_effect=inference.ModelNotTrainedError('no model')):
+            res = self.client.post(
+                DETECT_FRAUD_URL, VALID_PAYLOAD, format='json', HTTP_AUTHORIZATION=auth_header(),
+            )
+        self.assertEqual(res.status_code, 503)
+
+    def test_returns_the_fraud_assessment_on_success(self):
+        fake_result = {'risk_flag': 'Low', 'fraud_probability': 0.12, 'reasons': []}
+        with patch.object(inference, 'predict', return_value=fake_result):
+            res = self.client.post(
+                DETECT_FRAUD_URL, VALID_PAYLOAD, format='json', HTTP_AUTHORIZATION=auth_header(),
+            )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json(), fake_result)

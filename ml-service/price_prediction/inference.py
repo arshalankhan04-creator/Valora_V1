@@ -45,5 +45,5 @@ def predict(validated_data):
         'predicted_price_min': round(math.exp(point_estimate_log - residual_std_log), 2),
         'predicted_price_max': round(math.exp(point_estimate_log + residual_std_log), 2),
         'confidence_level': _confidence_from_spread(residual_std_log),
-        'feature_importance': artifact['numeric_importance'],
+        'feature_importance': artifact['feature_importance'],
     }
