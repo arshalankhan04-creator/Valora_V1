@@ -24,7 +24,11 @@ def _load_model():
             )
         import tensorflow as tf  # deferred: importing TF is slow, only pay for it once needed
 
-        _model = tf.keras.models.load_model(MODEL_PATH)
+        # compile=False: inference only ever calls predict(), never fit()/
+        # evaluate(), and train.py's class-weighted loss is a closure that
+        # isn't registered as a serializable Keras object — loading with
+        # compile=True tries to deserialize it and fails.
+        _model = tf.keras.models.load_model(MODEL_PATH, compile=False)
         with open(CLASSES_PATH) as f:
             _classes = json.load(f)
     return _model, _classes

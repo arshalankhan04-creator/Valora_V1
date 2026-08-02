@@ -49,7 +49,12 @@ live in the standing instructions already governing this project).
 - No depreciation forecasting, no agentic AI negotiation layer (spec's
   explicit Phase 2, not this project).
 - `condition_assessment` CNN is proof-of-concept (63 training images, 8
-  classes) — not production quality. Don't cite its accuracy as reliable.
+  classes, one with a single positive example) — not production quality.
+  Don't cite its accuracy as reliable. Fine-tunes MobileNetV2's last 50
+  layers with class-weighted loss (macro-F1 ~0.09 -> ~0.19 over a frozen/
+  unweighted baseline, per 5-fold CV) — a real improvement, still low in
+  absolute terms; judge it on macro-F1, not `binary_accuracy` (misleading
+  on this class imbalance).
 - Client tests deliberately don't cover the data-fetching pages themselves
   (Listings, ListingDetail, dashboards, Inquiries, Wishlist, Analytics) —
   each needs its own service-mocking pass, skipped for time so far.

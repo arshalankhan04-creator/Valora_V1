@@ -93,8 +93,21 @@ retrain from scratch:
 
 `fraud_detection` and `price_prediction` are trained and committed as of
 this writing; `condition_assessment` is trained but proof-of-concept scale
-only — 63 images across 8 damage/part classes, expect low recall until a
-larger dataset is collected.
+only — 63 images across 8 damage/part classes (one, `broken_windshield`,
+has a single positive example total), expect low recall until a larger
+dataset is collected.
+
+`condition_assessment`'s CNN fine-tunes the last 50 of MobileNetV2's 154
+layers (rather than a fully frozen backbone) with a class-weighted loss
+(rare damage classes count for more per misclassification than common
+ones, so gradient descent can't just win by always predicting 0 on them).
+Macro-F1 — precision/recall per class, macro-averaged, not `binary_accuracy`
+— is the honest metric here: a model that always predicts 0 scores ~98%
+"accuracy" on `broken_windshield` while being useless. A 5-fold CV
+comparison found the original frozen+unweighted setup scored macro-F1 ~0.09;
+class-weighting plus partial fine-tuning roughly doubled that to ~0.19 —
+still proof-of-concept quality, but a real, measured improvement over the
+previous setup, not just a bigger number from a differently-drawn split.
 
 `price_prediction` uses a `RandomForestRegressor` (200 trees) over one-hot
 brand/model/fuel/transmission plus numeric year/km/condition, fit on
