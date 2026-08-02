@@ -21,8 +21,18 @@ live in the standing instructions already governing this project).
 ### Not building (deliberately out of scope, don't add without discussion)
 - No real-time chat (Socket.io) — inquiries are plain REST, client polls.
 - No payments/checkout of any kind.
-- No web scraping (BeautifulSoup) for market data — mentioned in the spec as
-  a supporting feature, never started.
+- No web scraping (BeautifulSoup) for market data — researched and
+  deliberately declined (2026-08-03), not just unstarted. Checked real
+  marketplaces (CarDekho/Cars24/OLX: ToS explicitly prohibits scraping,
+  confirmed in CarDekho's actual T&C text, not just robots.txt), official
+  manufacturer price pages (Maruti Suzuki/Hyundai/Tata: all three are
+  JS-rendered SPAs, price genuinely absent from the raw HTML `requests`
+  receives — verified directly, not assumed), and government data (Vahan:
+  wrong data — registration counts, not prices). Wikipedia is a real,
+  legitimately scrapable exception (verified working) but only has specs/
+  production years, not current prices. No live source exists that's both
+  permitted and has real price data scrapable without a headless browser —
+  don't re-research this from scratch, re-read this note first.
 - No analytics dashboards (Seaborn/Plotly demand heatmaps) — not started.
 - No depreciation forecasting, no agentic AI negotiation layer (spec's
   explicit Phase 2, not this project).
