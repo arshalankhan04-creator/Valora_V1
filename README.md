@@ -128,9 +128,34 @@ trained model artifact per app, which is a separate, larger step (fixture
 models or mocking `inference.predict` per app) than this pass covers.
 
 ### client
-Not covered yet — would need a Vitest + Testing Library setup from scratch.
-Deferred as a follow-up; the marketplace flows are covered by the server's
-integration tests plus manual browser verification during development.
+```bash
+cd client
+npm test
+```
+Vitest + React Testing Library, jsdom environment (`src/test/setup.js`
+loads jest-dom matchers and clears localStorage between tests). 51 tests
+across 11 files:
+- Pure logic: `utils/format.js`, the trust-score tier boundaries in
+  `TrustScoreBadge`, `RiskFlagBadge`/`StatusBadge` label mapping.
+- `AuthContext`/`WishlistContext`: localStorage persistence, the
+  optimistic wishlist toggle *and* its rollback on a failed request
+  (mocking `services/wishlist.js`).
+- `ProtectedRoute`: redirect-to-login, redirect-on-wrong-role, and
+  renders-through cases, via a real `MemoryRouter`.
+- `Login`/`Register`: submits the right payload, navigates on success,
+  shows the server's error message vs. a generic fallback — mocking
+  `services/api.js` rather than hitting a real network call.
+- `ListingForm` (shared by Create/Edit): pre-fills from `initialValues`,
+  calls `onSubmit` with current field values, `showImages`/`submitting`
+  prop behavior.
+
+Not covered: the data-fetching pages themselves (`Listings`,
+`ListingDetail`, `SellerDashboard`, `AdminDashboard`, `Inquiries`,
+`Wishlist`) — each would need its own service-layer mocking in the same
+style as `Login`/`Register` above; skipped here for time, not because
+it's harder. The server's integration tests plus manual browser
+verification during development are what's actually exercised those
+flows so far.
 
 ## Deployment
 
