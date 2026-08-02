@@ -1,4 +1,5 @@
 import os
+import math
 import joblib
 
 from price_prediction.preprocessing import request_to_dataframe
@@ -22,13 +23,12 @@ def _load_artifact():
     return _artifact
 
 
-def _confidence_from_spread(residual_std, predicted_price):
-    if predicted_price == 0:
-        return 'low'
-    relative_spread = residual_std / predicted_price
-    if relative_spread < 0.05:
+def _confidence_from_spread(residual_std_log):
+    # In log space, residual_std IS the relative spread already (a std of
+    # 0.05 means predictions are typically within ~5% of actual).
+    if residual_std_log < 0.05:
         return 'high'
-    if relative_spread < 0.15:
+    if residual_std_log < 0.15:
         return 'medium'
     return 'low'
 
@@ -36,14 +36,14 @@ def _confidence_from_spread(residual_std, predicted_price):
 def predict(validated_data):
     artifact = _load_artifact()
     pipeline = artifact['pipeline']
-    residual_std = artifact['residual_std']
+    residual_std_log = artifact['residual_std_log']
 
     df = request_to_dataframe(validated_data)
-    point_estimate = float(pipeline.predict(df)[0])
+    point_estimate_log = float(pipeline.predict(df)[0])
 
     return {
-        'predicted_price_min': round(point_estimate - residual_std, 2),
-        'predicted_price_max': round(point_estimate + residual_std, 2),
-        'confidence_level': _confidence_from_spread(residual_std, point_estimate),
+        'predicted_price_min': round(math.exp(point_estimate_log - residual_std_log), 2),
+        'predicted_price_max': round(math.exp(point_estimate_log + residual_std_log), 2),
+        'confidence_level': _confidence_from_spread(residual_std_log),
         'feature_importance': artifact['numeric_importance'],
     }

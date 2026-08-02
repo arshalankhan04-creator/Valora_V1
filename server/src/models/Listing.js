@@ -13,7 +13,7 @@ const listingSchema = new mongoose.Schema(
     kmDriven: { type: Number, required: true },
     fuelType: {
       type: String,
-      enum: ['Petrol', 'Diesel', 'Electric', 'CNG', 'Hybrid'],
+      enum: ['Petrol', 'Diesel', 'Electric', 'CNG', 'LPG', 'Hybrid'],
       required: true,
     },
     transmission: { type: String, enum: ['Manual', 'Automatic'], required: true },

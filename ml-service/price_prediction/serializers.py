@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-FUEL_TYPES = ('Petrol', 'Diesel', 'Electric', 'CNG', 'Hybrid')
+FUEL_TYPES = ('Petrol', 'Diesel', 'Electric', 'CNG', 'LPG', 'Hybrid')
 TRANSMISSIONS = ('Manual', 'Automatic')
 
 
