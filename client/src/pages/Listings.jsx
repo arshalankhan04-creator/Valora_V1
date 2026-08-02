@@ -5,7 +5,18 @@ import ListingCard from '../components/ListingCard'
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'CNG', 'LPG', 'Hybrid']
 
 export default function Listings() {
-  const [filters, setFilters] = useState({ brand: '', fuelType: '', minPrice: '', maxPrice: '', minTrustScore: '' })
+  const [filters, setFilters] = useState({
+    brand: '',
+    model: '',
+    fuelType: '',
+    minPrice: '',
+    maxPrice: '',
+    minYear: '',
+    maxYear: '',
+    minKm: '',
+    maxKm: '',
+    minTrustScore: '',
+  })
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -47,6 +58,13 @@ export default function Listings() {
           onChange={handleFilterChange('brand')}
           className="border border-gray-300 rounded px-3 py-1.5 text-sm"
         />
+        <input
+          type="text"
+          placeholder="Model"
+          value={filters.model}
+          onChange={handleFilterChange('model')}
+          className="border border-gray-300 rounded px-3 py-1.5 text-sm"
+        />
         <select
           value={filters.fuelType}
           onChange={handleFilterChange('fuelType')}
@@ -70,6 +88,34 @@ export default function Listings() {
           value={filters.maxPrice}
           onChange={handleFilterChange('maxPrice')}
           className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32"
+        />
+        <input
+          type="number"
+          placeholder="Min year"
+          value={filters.minYear}
+          onChange={handleFilterChange('minYear')}
+          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
+        />
+        <input
+          type="number"
+          placeholder="Max year"
+          value={filters.maxYear}
+          onChange={handleFilterChange('maxYear')}
+          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
+        />
+        <input
+          type="number"
+          placeholder="Min km"
+          value={filters.minKm}
+          onChange={handleFilterChange('minKm')}
+          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
+        />
+        <input
+          type="number"
+          placeholder="Max km"
+          value={filters.maxKm}
+          onChange={handleFilterChange('maxKm')}
+          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
         />
         <select
           value={filters.minTrustScore}

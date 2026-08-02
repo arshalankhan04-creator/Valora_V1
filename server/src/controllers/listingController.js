@@ -1,6 +1,7 @@
 import Listing from '../models/Listing.js'
 import ApiError from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js'
+import escapeRegex from '../utils/escapeRegex.js'
 import { scoreListing } from '../services/listingIntelligence.js'
 
 export const createListing = asyncHandler(async (req, res) => {
@@ -31,15 +32,40 @@ export const createListing = asyncHandler(async (req, res) => {
 })
 
 export const getListings = asyncHandler(async (req, res) => {
-  const { brand, fuelType, minPrice, maxPrice, minTrustScore } = req.query
+  const {
+    brand,
+    model,
+    fuelType,
+    minPrice,
+    maxPrice,
+    minYear,
+    maxYear,
+    minKm,
+    maxKm,
+    minTrustScore,
+  } = req.query
 
   const filter = { status: 'active' }
-  if (brand) filter.brand = brand
+  // Free-text fields get a case-insensitive partial match, not exact
+  // equality — a search box where "swift" doesn't find "Maruti Suzuki
+  // Swift" isn't search, it's a lookup table.
+  if (brand) filter.brand = new RegExp(escapeRegex(brand), 'i')
+  if (model) filter.model = new RegExp(escapeRegex(model), 'i')
   if (fuelType) filter.fuelType = fuelType
   if (minPrice || maxPrice) {
     filter.price = {}
     if (minPrice) filter.price.$gte = Number(minPrice)
     if (maxPrice) filter.price.$lte = Number(maxPrice)
+  }
+  if (minYear || maxYear) {
+    filter.year = {}
+    if (minYear) filter.year.$gte = Number(minYear)
+    if (maxYear) filter.year.$lte = Number(maxYear)
+  }
+  if (minKm || maxKm) {
+    filter.kmDriven = {}
+    if (minKm) filter.kmDriven.$gte = Number(minKm)
+    if (maxKm) filter.kmDriven.$lte = Number(maxKm)
   }
   if (minTrustScore) filter['ml.trustScore'] = { $gte: Number(minTrustScore) }
 
