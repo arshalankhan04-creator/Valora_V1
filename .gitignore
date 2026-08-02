@@ -30,13 +30,16 @@ env/
 staticfiles/
 media/
 
-# --- ML model artifacts (large binaries, don't commit trained weights) ---
-*.h5
-*.pkl
-*.joblib
-*.keras
-ml-service/**/models/*
-!ml-service/**/models/.gitkeep
+# --- ML model artifacts ---
+# Reversal from earlier in the project: these ARE committed now
+# (ml-service/*/models/*.joblib, *.keras, *_classes.json — ~16MB total).
+# A deployed ml-service needs working models on first boot, and two of the
+# three (price_prediction, condition_assessment) can't be retrained on a
+# fresh deploy anyway since their raw datasets aren't committed (see below) —
+# an untrained fresh clone would 503 forever with no way to fix it short of
+# manually re-uploading datasets. The models themselves are just weights, not
+# a redistribution of the source data, so this doesn't reopen the dataset
+# license concern below.
 
 # --- Third-party datasets (Kaggle etc.) — redistribution license unclear,
 # don't push someone else's dataset to a public repo. Keep the *.gitkeep
