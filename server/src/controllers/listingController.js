@@ -16,7 +16,10 @@ export const createListing = asyncHandler(async (req, res) => {
     transmission,
     price,
     description,
-    images: (req.files || []).map((file) => file.path),
+    // Normalize to forward slashes: multer's file.path uses the OS
+    // separator (backslash on Windows), but this gets served over HTTP
+    // via express.static('uploads') and consumed as a URL fragment.
+    images: (req.files || []).map((file) => file.path.replace(/\\/g, '/')),
   })
 
   const { ml, status } = await scoreListing(listing, req.user)

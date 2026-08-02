@@ -11,6 +11,7 @@ const app = express()
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
 app.use(express.json())
 app.use(morgan('dev'))
+app.use('/uploads', express.static('uploads'))
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 app.use('/api/auth', authRoutes)
