@@ -8,6 +8,7 @@ import Listings from '../pages/Listings'
 import ListingDetail from '../pages/ListingDetail'
 import CreateListing from '../pages/CreateListing'
 import Inquiries from '../pages/Inquiries'
+import AdminDashboard from '../pages/AdminDashboard'
 import NotFound from '../pages/NotFound'
 
 export default function AppRoutes() {
@@ -32,6 +33,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Inquiries />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

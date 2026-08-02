@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   createListing,
   getListings,
+  getAdminListings,
   getListingById,
   updateListing,
   deleteListing,
@@ -12,6 +13,8 @@ import { uploadListingImages } from '../middleware/upload.js'
 const router = Router()
 
 router.get('/', getListings)
+// Must come before /:id — otherwise Express matches "admin" as the :id param.
+router.get('/admin', protect, authorize('admin'), getAdminListings)
 router.get('/:id', getListingById)
 router.post(
   '/',

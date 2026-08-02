@@ -16,6 +16,7 @@ export default function Layout() {
             <>
               {(user.role === 'seller' || user.role === 'admin') && <Link to="/sell">Sell a car</Link>}
               <Link to="/inquiries">Inquiries</Link>
+              {user.role === 'admin' && <Link to="/admin">Admin</Link>}
               <button onClick={logout} className="text-gray-900">
                 Log out
               </button>

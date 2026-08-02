@@ -47,20 +47,53 @@ export const getListings = asyncHandler(async (req, res) => {
   res.json({ listings })
 })
 
+export const getAdminListings = asyncHandler(async (req, res) => {
+  const { status } = req.query
+  const filter = status ? { status } : {}
+
+  const listings = await Listing.find(filter)
+    .populate('seller', 'name email')
+    .sort({ createdAt: -1 })
+  res.json({ listings })
+})
+
 export const getListingById = asyncHandler(async (req, res) => {
   const listing = await Listing.findById(req.params.id).populate('seller', 'name email')
   if (!listing) throw new ApiError(404, 'Listing not found')
   res.json({ listing })
 })
 
+const SELLER_UPDATE_FIELDS = [
+  'brand',
+  'model',
+  'year',
+  'kmDriven',
+  'fuelType',
+  'transmission',
+  'price',
+  'description',
+]
+
 export const updateListing = asyncHandler(async (req, res) => {
   const listing = await Listing.findById(req.params.id)
   if (!listing) throw new ApiError(404, 'Listing not found')
-  if (String(listing.seller) !== String(req.user._id)) {
+
+  const isOwner = String(listing.seller) === String(req.user._id)
+  const isAdmin = req.user.role === 'admin'
+  if (!isOwner && !isAdmin) {
     throw new ApiError(403, 'Not your listing')
   }
 
-  Object.assign(listing, req.body)
+  // Whitelist which fields each role may touch — an unrestricted
+  // Object.assign(listing, req.body) would let a PATCH overwrite `seller`,
+  // `ml`, or `_id`. Only admins may change moderation status.
+  for (const field of SELLER_UPDATE_FIELDS) {
+    if (field in req.body) listing[field] = req.body[field]
+  }
+  if (isAdmin && 'status' in req.body) {
+    listing.status = req.body.status
+  }
+
   await listing.save()
   res.json({ listing })
 })

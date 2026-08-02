@@ -16,3 +16,17 @@ export function createListing(formData) {
     .post('/listings', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
     .then((res) => res.data.listing)
 }
+
+export function getAdminListings(status) {
+  return api
+    .get('/listings/admin', { params: status ? { status } : {} })
+    .then((res) => res.data.listings)
+}
+
+export function updateListingStatus(id, status) {
+  return api.patch(`/listings/${id}`, { status }).then((res) => res.data.listing)
+}
+
+export function deleteListing(id) {
+  return api.delete(`/listings/${id}`)
+}
