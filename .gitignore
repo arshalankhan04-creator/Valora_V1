@@ -36,6 +36,17 @@ media/
 ml-service/**/models/*
 !ml-service/**/models/.gitkeep
 
+# --- Third-party datasets (Kaggle etc.) — redistribution license unclear,
+# don't push someone else's dataset to a public repo. Keep the *.gitkeep
+# and the small prepare_data.py-generated summaries (labels.csv, tag_map.json),
+# not raw source files or copied images/CSVs. See ml-service/README section
+# on regenerating training data locally. ---
+ml-service/price_prediction/data/*.csv
+ml-service/condition_assessment/data/Annotated Dataset of Car Parts with Damage/
+ml-service/condition_assessment/data/Coco Car Damage Detection Dataset/
+ml-service/condition_assessment/data/images/*.jpg
+!ml-service/condition_assessment/data/images/.gitkeep
+
 # --- Uploaded media (created at runtime by server/src/middleware/upload.js) ---
 server/uploads/
 

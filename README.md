@@ -3,8 +3,8 @@
 A used-car marketplace where every listing is scored by four ML systems
 before a buyer sees it: fair-price prediction, fraud/anomaly detection,
 CNN-based condition assessment, and a combined Trust Score. See
-[Valora_Final_Spec_APIs.md](Valora_Final_Spec_APIs.md) for the full spec and
-[Valora_Team_Workflow.md](Valora_Team_Workflow.md) §8 for the Node↔Django API
+[docs/Valora_Final_Spec_APIs.md](docs/Valora_Final_Spec_APIs.md) for the full spec and
+[docs/Valora_Team_Workflow.md](docs/Valora_Team_Workflow.md) §8 for the Node↔Django API
 contract (originally written for a 2-person team; built solo end-to-end).
 
 ## Structure
@@ -54,10 +54,25 @@ python manage.py runserver 8000
 ```
 
 Each ML app (`price_prediction`, `fraud_detection`, `condition_assessment`)
-ships with real preprocessing/train/inference code but no trained model yet —
-supply a dataset under that app's `data/` folder and run
-`python -m <app>.train` before calling its endpoint (it returns HTTP 503
-with a clear message otherwise, rather than a fake result).
+ships with real preprocessing/train/inference code. An untrained app's
+endpoint returns HTTP 503 with a clear message rather than a fake result.
+
+### Training data
+
+Raw/third-party datasets are **not committed** (unclear Kaggle redistribution
+license) — only the scripts that build training data from them are. To
+retrain from scratch:
+
+| App | Source | Steps |
+|---|---|---|
+| `fraud_detection` | Synthetic (spec explicitly allows this — no real "labeled scam" dataset exists) | `python -m fraud_detection.generate_synthetic_data` then `python -m fraud_detection.train` |
+| `price_prediction` | [CarDekho Used Car Dataset](https://www.kaggle.com/datasets/manishkr1754/cardekho-used-car-data) (Kaggle) | Download `cardekho_dataset.csv` into `price_prediction/data/`, then `python -m price_prediction.prepare_data` and `python -m price_prediction.train` |
+| `condition_assessment` | [Coco Car Damage Detection Dataset](https://www.kaggle.com/datasets/lplenka/coco-car-damage-detection-dataset) + [Annotated Dataset of Car Parts with Damage](https://www.kaggle.com/datasets/shubhammkumaar/car-damage-parts-detection) (Kaggle — same underlying 1024x1024 photos, confirmed by matching filenames/dimensions) | Download both into `condition_assessment/data/` (keep their original folder names), then `python -m condition_assessment.prepare_data` and `python -m condition_assessment.train` |
+
+`fraud_detection` and `price_prediction` are trained and committed as of
+this writing; `condition_assessment` is trained but proof-of-concept scale
+only — 63 images across 8 damage/part classes, expect low recall until a
+larger dataset is collected.
 
 ## Git workflow
 
