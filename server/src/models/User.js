@@ -24,10 +24,12 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
-userSchema.pre('save', async function hashPassword(next) {
-  if (!this.isModified('password')) return next()
+// Mongoose 9 middleware is promise-based: an async pre-hook with no `next`
+// param resolves the hook itself, no callback needed (calling a `next` arg
+// here throws, since none is passed when the function takes zero args).
+userSchema.pre('save', async function hashPassword() {
+  if (!this.isModified('password')) return
   this.password = await bcrypt.hash(this.password, 10)
-  next()
 })
 
 userSchema.methods.comparePassword = function comparePassword(candidate) {
