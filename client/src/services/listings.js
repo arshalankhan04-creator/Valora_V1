@@ -17,6 +17,14 @@ export function createListing(formData) {
     .then((res) => res.data.listing)
 }
 
+export function getMyListings() {
+  return api.get('/listings/mine').then((res) => res.data.listings)
+}
+
+export function updateListing(id, data) {
+  return api.patch(`/listings/${id}`, data).then((res) => res.data.listing)
+}
+
 export function getAdminListings(status) {
   return api
     .get('/listings/admin', { params: status ? { status } : {} })

@@ -14,7 +14,12 @@ export default function Layout() {
           <Link to="/listings">Listings</Link>
           {user ? (
             <>
-              {(user.role === 'seller' || user.role === 'admin') && <Link to="/sell">Sell a car</Link>}
+              {(user.role === 'seller' || user.role === 'admin') && (
+                <>
+                  <Link to="/sell">Sell a car</Link>
+                  <Link to="/my-listings">My listings</Link>
+                </>
+              )}
               <Link to="/inquiries">Inquiries</Link>
               {user.role === 'admin' && <Link to="/admin">Admin</Link>}
               <button onClick={logout} className="text-gray-900">

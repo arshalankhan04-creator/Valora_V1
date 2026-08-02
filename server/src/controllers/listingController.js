@@ -47,6 +47,11 @@ export const getListings = asyncHandler(async (req, res) => {
   res.json({ listings })
 })
 
+export const getMyListings = asyncHandler(async (req, res) => {
+  const listings = await Listing.find({ seller: req.user._id }).sort({ createdAt: -1 })
+  res.json({ listings })
+})
+
 export const getAdminListings = asyncHandler(async (req, res) => {
   const { status } = req.query
   const filter = status ? { status } : {}

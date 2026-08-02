@@ -7,6 +7,8 @@ import Register from '../pages/Register'
 import Listings from '../pages/Listings'
 import ListingDetail from '../pages/ListingDetail'
 import CreateListing from '../pages/CreateListing'
+import EditListing from '../pages/EditListing'
+import SellerDashboard from '../pages/SellerDashboard'
 import Inquiries from '../pages/Inquiries'
 import AdminDashboard from '../pages/AdminDashboard'
 import NotFound from '../pages/NotFound'
@@ -25,6 +27,22 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute roles={['seller', 'admin']}>
               <CreateListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-listings"
+          element={
+            <ProtectedRoute roles={['seller', 'admin']}>
+              <SellerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-listings/:id/edit"
+          element={
+            <ProtectedRoute roles={['seller', 'admin']}>
+              <EditListing />
             </ProtectedRoute>
           }
         />
