@@ -46,14 +46,26 @@ export const getMyInquiries = asyncHandler(async (req, res) => {
 export const addMessage = asyncHandler(async (req, res) => {
   const { text } = req.body
   const inquiry = await Inquiry.findById(req.params.id)
+    .populate('buyer', 'email name')
+    .populate('seller', 'email name')
   if (!inquiry) throw new ApiError(404, 'Inquiry not found')
 
-  const isParticipant = [String(inquiry.buyer), String(inquiry.seller)].includes(
-    String(req.user._id),
-  )
-  if (!isParticipant) throw new ApiError(403, 'Not part of this conversation')
+  const isBuyer = String(inquiry.buyer._id) === String(req.user._id)
+  const isSeller = String(inquiry.seller._id) === String(req.user._id)
+  if (!isBuyer && !isSeller) throw new ApiError(403, 'Not part of this conversation')
 
   inquiry.messages.push({ sender: req.user._id, text })
   await inquiry.save()
+
+  // Notify whichever party didn't send this message — same fire-and-forget
+  // pattern as createInquiry: a slow/down SMTP server shouldn't block the
+  // reply itself.
+  const recipient = isBuyer ? inquiry.seller : inquiry.buyer
+  sendMail({
+    to: recipient.email,
+    subject: 'New reply to your Valora inquiry',
+    text: `${req.user.name} says: ${text}`,
+  }).catch((err) => console.error('Failed to send reply email:', err.message))
+
   res.status(201).json({ inquiry })
 })

@@ -42,6 +42,28 @@ cp .env.example .env   # fill in MONGODB_URI, JWT_SECRET, SMTP_*
 npm run dev
 ```
 
+#### Email
+
+Inquiry notifications (new inquiry, new reply) go through `emailService.js`.
+Sending is fire-and-forget — a slow or misconfigured SMTP server logs an
+error but never fails the request itself (see `inquiryController.js`).
+
+For local dev/demo, skip real SMTP entirely and use a free
+[Ethereal](https://ethereal.email) sandbox account — no signup, just:
+```bash
+node -e "import('nodemailer').then(async ({default:n})=>console.log(await n.createTestAccount()))"
+```
+Copy the printed `user`/`pass` into `SMTP_USER`/`SMTP_PASS`, set
+`SMTP_HOST=smtp.ethereal.email`. Nothing is delivered to a real inbox —
+instead, every `sendMail()` call logs a preview URL
+(`nodemailer.getTestMessageUrl`) you can open to see exactly what would
+have been sent. Good enough to demo the feature working end-to-end without
+risking a stray email to a real address during testing/grading.
+
+For an actual deployment where real delivery matters, swap in a real
+provider (Gmail app password, SendGrid, Mailtrap, Resend, etc.) — same
+`SMTP_*` env vars, no code changes needed.
+
 ### ml-service
 ```bash
 cd ml-service
