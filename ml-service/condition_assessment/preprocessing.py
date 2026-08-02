@@ -1,17 +1,19 @@
-"""Image preprocessing shared between train.py and inference.py."""
+"""Image preprocessing shared between train.py and inference.py.
+
+The damage class vocabulary (e.g. 'dent_front_bumper') isn't hardcoded here
+— it's derived from whatever labels.csv actually contains (see
+prepare_data.py) and persisted alongside the trained model, since it's a
+property of the training data, not a fixed constant.
+"""
 
 import numpy as np
 from PIL import Image
 
 IMAGE_SIZE = (224, 224)  # matches MobileNetV2's expected input
-# Multi-label, not mutually exclusive — a photo can show a scratch and rust
-# at once. Absence of all three at inference time means "no damage detected".
-DAMAGE_CLASSES = ['scratch', 'dent', 'rust']
 
 
-def load_image(file_obj):
-    """file_obj: any file-like object DRF/Django gives us for an uploaded image."""
-    image = Image.open(file_obj).convert('RGB').resize(IMAGE_SIZE)
+def load_image(path_or_file):
+    image = Image.open(path_or_file).convert('RGB').resize(IMAGE_SIZE)
     array = np.asarray(image, dtype='float32') / 255.0
     return array
 
