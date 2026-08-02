@@ -2,8 +2,10 @@
 .env
 .env.local
 .env.*.local
+.env.test
 */.env
 */.env.local
+*/.env.test
 
 # --- Node (client/, server/) ---
 node_modules/
