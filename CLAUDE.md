@@ -18,7 +18,8 @@ live in the standing instructions already governing this project).
 - 4 ML layers, all live and wired: price prediction (regression), fraud
   detection (classification), CNN condition assessment, combined Trust Score.
 - Automated tests: server (Vitest+Supertest, 46 tests), client (Vitest+RTL,
-  51 tests), ml-service (Django test runner, 34 tests — includes
+  94 tests — all pages covered, each with its own service mock), ml-service
+  (Django test runner, 34 tests — includes
   view-level auth/validation/success/model-not-trained coverage for all
   four ML endpoints, model inference mocked via `unittest.mock.patch.object`).
 - Light security hardening: helmet, rate-limiting on auth routes, NoSQL
@@ -55,9 +56,6 @@ live in the standing instructions already governing this project).
   unweighted baseline, per 5-fold CV) — a real improvement, still low in
   absolute terms; judge it on macro-F1, not `binary_accuracy` (misleading
   on this class imbalance).
-- Client tests deliberately don't cover the data-fetching pages themselves
-  (Listings, ListingDetail, dashboards, Inquiries, Wishlist, Analytics) —
-  each needs its own service-mocking pass, skipped for time so far.
 
 ## 2. Architecture — exact request flow
 

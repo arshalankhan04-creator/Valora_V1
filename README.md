@@ -186,8 +186,8 @@ cd client
 npm test
 ```
 Vitest + React Testing Library, jsdom environment (`src/test/setup.js`
-loads jest-dom matchers and clears localStorage between tests). 51 tests
-across 11 files:
+loads jest-dom matchers and clears localStorage between tests). 94 tests
+across 18 files:
 - Pure logic: `utils/format.js`, the trust-score tier boundaries in
   `TrustScoreBadge`, `RiskFlagBadge`/`StatusBadge` label mapping.
 - `AuthContext`/`WishlistContext`: localStorage persistence, the
@@ -201,14 +201,18 @@ across 11 files:
 - `ListingForm` (shared by Create/Edit): pre-fills from `initialValues`,
   calls `onSubmit` with current field values, `showImages`/`submitting`
   prop behavior.
-
-Not covered: the data-fetching pages themselves (`Listings`,
-`ListingDetail`, `SellerDashboard`, `AdminDashboard`, `Inquiries`,
-`Wishlist`) — each would need its own service-layer mocking in the same
-style as `Login`/`Register` above; skipped here for time, not because
-it's harder. The server's integration tests plus manual browser
-verification during development are what's actually exercised those
-flows so far.
+- The data-fetching pages — `Listings`, `ListingDetail`, `SellerDashboard`,
+  `AdminDashboard`, `Inquiries`, `Wishlist`, `Analytics` — each with its
+  own service-layer mock (`vi.mock('../services/...')`): loading/empty/
+  error states, and the page-specific behavior that actually matters —
+  `ListingDetail`'s three visibility rules for the contact-seller form
+  (logged out, own listing, admin), `AdminDashboard`'s status filter
+  re-fetching and optimistic approve, `Inquiries`' reply flow and thread
+  switching, `Wishlist`'s filtering against the shared `wishlistIds` set
+  rather than its own stale fetch. `Analytics` mocks `react-chartjs-2`
+  itself (`Bar`/`Line` → plain divs exposing their `data` prop) since
+  jsdom has no real `<canvas>` 2D context for Chart.js to render into —
+  cheaper than pulling in a canvas polyfill for one test file.
 
 ## Deployment
 
