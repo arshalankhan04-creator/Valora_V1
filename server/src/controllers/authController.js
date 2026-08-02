@@ -13,9 +13,16 @@ function toPublicUser(user) {
   return { id: user._id, name: user.name, email: user.email, role: user.role }
 }
 
+// Rejects both "missing" and "wrong type" — a JSON body of
+// {"email": {"$ne": null}} is truthy but not a string, and without this
+// check it flows straight into a Mongoose query filter as a Mongo operator.
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.length > 0
+}
+
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body
-  if (!name || !email || !password) {
+  if (!isNonEmptyString(name) || !isNonEmptyString(email) || !isNonEmptyString(password)) {
     throw new ApiError(400, 'name, email, and password are required')
   }
 
@@ -36,7 +43,7 @@ export const register = asyncHandler(async (req, res) => {
 
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body
-  if (!email || !password) {
+  if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
     throw new ApiError(400, 'email and password are required')
   }
 

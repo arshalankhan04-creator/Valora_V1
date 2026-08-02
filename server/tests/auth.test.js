@@ -45,6 +45,14 @@ describe('POST /api/auth/register', () => {
 
     expect(res.status).toBe(409)
   })
+
+  it('rejects a NoSQL-injection-style object instead of a string field', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'X', email: { $ne: null }, password: 'password123' })
+
+    expect(res.status).toBe(400)
+  })
 })
 
 describe('POST /api/auth/login', () => {
@@ -73,6 +81,19 @@ describe('POST /api/auth/login', () => {
       .send({ email: 'nobody@valora.test', password: 'whatever123' })
 
     expect(res.status).toBe(401)
+  })
+
+  it('rejects a NoSQL-injection-style object instead of a string credential', async () => {
+    // A raw JSON body of {"email": {"$ne": null}} is a real payload a
+    // client can send. Without a type check, User.findOne({ email })
+    // would pass { $ne: null } straight through as a Mongo query operator
+    // and match the first user in the collection — an auth bypass.
+    await request(app).post('/api/auth/register').send(VALID_USER)
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: { $ne: null }, password: { $ne: null } })
+
+    expect(res.status).toBe(400)
   })
 })
 

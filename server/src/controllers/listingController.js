@@ -45,6 +45,19 @@ export const getListings = asyncHandler(async (req, res) => {
     minTrustScore,
   } = req.query
 
+  // A repeated query key (?fuelType=a&fuelType=b) parses to an array under
+  // Express 5's default query parser, not a string — and Express 5 no
+  // longer parses bracket notation into nested objects by default the way
+  // Express 4's `qs`-based parser did, but that's a default that could
+  // change (a custom 'query parser' setting, a future Express version).
+  // Every free-text param gets a string check before touching `filter`
+  // either way, rather than relying on the current parser's behavior.
+  for (const [key, value] of Object.entries({ brand, model, fuelType })) {
+    if (value !== undefined && typeof value !== 'string') {
+      throw new ApiError(400, `${key} must be a string`)
+    }
+  }
+
   const filter = { status: 'active' }
   // Free-text fields get a case-insensitive partial match, not exact
   // equality — a search box where "swift" doesn't find "Maruti Suzuki
@@ -80,6 +93,9 @@ export const getMyListings = asyncHandler(async (req, res) => {
 
 export const getAdminListings = asyncHandler(async (req, res) => {
   const { status } = req.query
+  if (status !== undefined && typeof status !== 'string') {
+    throw new ApiError(400, 'status must be a string')
+  }
   const filter = status ? { status } : {}
 
   const listings = await Listing.find(filter)

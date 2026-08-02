@@ -142,6 +142,16 @@ describe('GET /api/listings', () => {
     expect(res.body.listings).toHaveLength(1)
   })
 
+  it('rejects a repeated query param (parses to an array, not a string)', async () => {
+    // ?fuelType=a&fuelType=b parses to req.query.fuelType = ['a', 'b'] under
+    // Express 5's default query parser — an array, not a string. Assigning
+    // that straight into the Mongo filter without a type check would let a
+    // client hand Mongoose something other than the plain equality match
+    // the query was designed for.
+    const res = await request(app).get('/api/listings?fuelType=Petrol&fuelType=Diesel')
+    expect(res.status).toBe(400)
+  })
+
   it('filters by year range', async () => {
     const { token } = await registerUser('seller')
     await createListing(token, { year: 2015 })
