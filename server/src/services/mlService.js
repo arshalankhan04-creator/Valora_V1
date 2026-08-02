@@ -5,6 +5,11 @@ import FormData from 'form-data'
 
 const mlClient = axios.create({
   baseURL: process.env.ML_SERVICE_URL || 'http://localhost:8000/api/ml',
+  // Free-tier hosting (e.g. Render) spins ml-service down after inactivity —
+  // the first request after idle can take 60-90s to cold-start. Without a
+  // timeout, axios's default is to wait forever, hanging the listing
+  // creation request indefinitely instead of failing predictably.
+  timeout: 90_000,
 })
 
 // Node and Django share JWT_SECRET (see Valora_Team_Workflow.md §8: "require

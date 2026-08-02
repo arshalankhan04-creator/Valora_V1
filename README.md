@@ -110,6 +110,71 @@ Not covered yet — would need a Vitest + Testing Library setup from scratch.
 Deferred as a follow-up; the marketplace flows are covered by the server's
 integration tests plus manual browser verification during development.
 
+## Deployment
+
+Target stack: **Vercel** (client), **Render** (server + ml-service),
+**MongoDB Atlas** (database) — matches `docs/Valora_Team_Workflow.md`'s
+original plan. Account creation and dashboard clicking are inherently
+manual steps (Claude has no access to any of these three platforms in this
+project) — everything below is what to actually enter once you're in each
+dashboard. `render.yaml` at the repo root is a best-effort Blueprint for the
+two Render services, but it's untested against a live Render account —
+if "New Blueprint" rejects something, fall back to creating each service
+manually and use the env var lists below directly.
+
+**Known limitation, decide now whether it's acceptable:** Render's free
+tier filesystem is ephemeral — uploaded listing photos (`server/uploads/`)
+are wiped on every redeploy or restart. Fine for a demo/viva; if you need
+photos to survive redeploys, swap `multer`'s disk storage for Cloudinary
+(already listed as an optional external API in the spec doc) — that's a
+separate task, not done here.
+
+### Order of operations (each step needs the previous one's output)
+
+1. **MongoDB Atlas** — create a free M0 cluster, a database user, allow
+   network access from anywhere (`0.0.0.0/0`, simplest for a free-tier demo),
+   and copy the connection string (add `/valora_v1` before the `?` query
+   params as the database name).
+2. **Pick one JWT_SECRET value** (any long random string) — you'll paste
+   this exact value into *both* Render services below. If it's not
+   character-for-character identical, every Node→Django ML call 401s.
+3. **Deploy `ml-service` to Render first** (server needs its URL next):
+   New Web Service → this repo → root directory `ml-service` → Python
+   runtime, pinned to **3.13.x** (see `render.yaml`'s `pythonVersion` — this
+   is not optional, TensorFlow has no 3.14 wheels).
+   - Build: `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
+   - Start: `gunicorn valora_ml.wsgi:application --workers 1 --timeout 120 --bind 0.0.0.0:$PORT`
+   - Env vars: `DJANGO_SECRET_KEY` (Render can generate this), `DJANGO_DEBUG=False`,
+     `DJANGO_ALLOWED_HOSTS=<this-service>.onrender.com`, `JWT_SECRET=<step 2>`,
+     `CORS_ALLOWED_ORIGINS=` (leave blank for now, filled in step 5).
+   - Note the assigned URL (e.g. `https://valora-ml-service.onrender.com`).
+4. **Deploy `server` to Render**: New Web Service → root directory `server`
+   → Node runtime → build `npm install` → start `npm start`.
+   - Env vars: `MONGODB_URI=<step 1>`, `JWT_SECRET=<step 2>`, `JWT_EXPIRES_IN=7d`,
+     `ML_SERVICE_URL=<step 3 URL>/api/ml`, `CLIENT_URL=` (blank for now,
+     step 6), `SMTP_*` (optional — inquiry emails silently log-and-continue
+     without them, see `inquiryController.js`).
+   - Note the assigned URL.
+5. **Go back to `ml-service`'s env vars** and set
+   `CORS_ALLOWED_ORIGINS=<step 4 URL>` (defense in depth only — browsers
+   never call ml-service directly, only Node does). Restart the service.
+6. **Deploy `client` to Vercel**: import the repo, root directory `client`
+   (Vite auto-detected). Set `VITE_API_URL=<step 4 URL>/api` as an
+   **environment variable in Vercel's project settings before building** —
+   Vite bakes env vars in at build time, not runtime, so adding it after
+   the fact means rebuilding, not just restarting.
+7. **Go back to `server`'s env vars** and set `CLIENT_URL=<step 6 Vercel URL>`
+   (needed for CORS). Restart the service.
+8. **Seed the production database (optional)**: there's no shell access on
+   Render's free tier. Easiest path: temporarily point your *local*
+   `server/.env`'s `MONGODB_URI` at the Atlas connection string, run
+   `npm run seed` from your machine, then change it back to your local
+   Mongo instance.
+9. **Smoke test**: visit the Vercel URL, register, browse, and create a
+   listing. If `ml-service` had been idle, the first listing creation can
+   take 60-90s (Render free-tier cold start) — this is expected, not a bug;
+   `mlService.js`'s 90s axios timeout is sized for exactly this.
+
 ## Git workflow
 
 - `main` — stable only, nothing pushed directly

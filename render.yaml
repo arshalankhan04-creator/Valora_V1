@@ -1,0 +1,69 @@
+# Render Blueprint — deploys server/ and ml-service/ as two web services.
+# Untested against a live Render account in this session (no Render access
+# here) — treat as a strong starting point, not a guarantee. If "New
+# Blueprint" in the Render dashboard rejects something, the manual
+# per-service dashboard setup in README.md's Deployment section is the
+# fallback path and is what's actually been reasoned through in detail.
+#
+# IMPORTANT: every `sync: false` value must be entered by hand in the Render
+# dashboard after the blueprint creates the services — most critically,
+# JWT_SECRET must be the *exact same string* on both services, or every
+# Node→Django ML call fails auth.
+
+services:
+  - type: web
+    name: valora-server
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # MongoDB Atlas connection string
+      - key: JWT_SECRET
+        sync: false # must match ml-service's JWT_SECRET exactly
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        sync: false # deployed Vercel URL, e.g. https://valora.vercel.app
+      - key: ML_SERVICE_URL
+        sync: false # e.g. https://valora-ml-service.onrender.com/api/ml
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: '587'
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
+  - type: web
+    name: valora-ml-service
+    runtime: python
+    rootDir: ml-service
+    plan: free
+    # TensorFlow has no Python 3.14 wheels (see CLAUDE.md) — this MUST stay
+    # pinned to a 3.13.x version or the build fails on the tensorflow install.
+    pythonVersion: '3.13.7'
+    buildCommand: 'pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate'
+    # --workers 1: TensorFlow + Keras + scikit-learn's import footprint is
+    # large relative to Render's free-tier RAM; each additional gunicorn
+    # worker loads its own copy of everything. Don't raise this without
+    # upgrading the plan.
+    startCommand: 'gunicorn valora_ml.wsgi:application --workers 1 --timeout 120 --bind 0.0.0.0:$PORT'
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: 'False'
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false # e.g. valora-ml-service.onrender.com
+      - key: JWT_SECRET
+        sync: false # must match server's JWT_SECRET exactly
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false # deployed server URL — defense in depth only, browsers never call this service directly
