@@ -13,9 +13,13 @@ export default function Layout() {
         <nav className="flex items-center gap-4 text-sm text-gray-600">
           <Link to="/listings">Listings</Link>
           {user ? (
-            <button onClick={logout} className="text-gray-900">
-              Log out
-            </button>
+            <>
+              {(user.role === 'seller' || user.role === 'admin') && <Link to="/sell">Sell a car</Link>}
+              <Link to="/inquiries">Inquiries</Link>
+              <button onClick={logout} className="text-gray-900">
+                Log out
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login">Log in</Link>
