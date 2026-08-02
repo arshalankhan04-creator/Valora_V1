@@ -55,6 +55,9 @@ ml-service/condition_assessment/data/images/*.jpg
 # --- Uploaded media (created at runtime by server/src/middleware/upload.js) ---
 server/uploads/
 
+# --- Generated EDA charts (regenerate with `python -m price_prediction.eda`) ---
+ml-service/price_prediction/eda_charts/
+
 # --- OS / editor ---
 .DS_Store
 Thumbs.db

@@ -38,3 +38,7 @@ export function updateListingStatus(id, status) {
 export function deleteListing(id) {
   return api.delete(`/listings/${id}`)
 }
+
+export function getMarketAnalytics() {
+  return api.get('/listings/analytics').then((res) => res.data)
+}

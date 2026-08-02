@@ -18,6 +18,7 @@ export default function Layout() {
                 <>
                   <Link to="/sell">Sell a car</Link>
                   <Link to="/my-listings">My listings</Link>
+                  <Link to="/analytics">Analytics</Link>
                 </>
               )}
               <Link to="/wishlist">Wishlist</Link>

@@ -10,13 +10,19 @@ live in the standing instructions already governing this project).
 - MERN marketplace (React/Vite/Tailwind + Node/Express/MongoDB) + a Django/DRF
   ML microservice, built solo end-to-end.
 - Core marketplace: JWT auth (buyer/seller/admin), listing CRUD with image
-  upload, search/filter, buyer↔seller inquiry/chat, wishlist, seller
-  dashboard (view/edit/delete own listings), admin dashboard (moderate
-  flagged listings).
+  upload, search/filter (brand/model partial match, fuel type, price/year/km
+  range, trust score), buyer↔seller inquiry/chat with email notifications,
+  wishlist, seller dashboard (view/edit/delete own listings), admin
+  dashboard (moderate flagged listings), live market-analytics dashboard
+  (MongoDB aggregation + Chart.js — see §6).
 - 4 ML layers, all live and wired: price prediction (regression), fraud
   detection (classification), CNN condition assessment, combined Trust Score.
-- Automated tests: server (Vitest+Supertest, 31 tests), ml-service (Django
-  test runner, 21 tests).
+- Automated tests: server (Vitest+Supertest, 46 tests), client (Vitest+RTL,
+  51 tests), ml-service (Django test runner, 21 tests).
+- Light security hardening: helmet, rate-limiting on auth routes, NoSQL
+  injection type-guards on every value that reaches a Mongoose query filter.
+- Deployment prep done (render.yaml, vercel.json, production Django config)
+  but deployment itself is on hold — proceed only when explicitly told to.
 
 ### Not building (deliberately out of scope, don't add without discussion)
 - No real-time chat (Socket.io) — inquiries are plain REST, client polls.
@@ -33,13 +39,18 @@ live in the standing instructions already governing this project).
   production years, not current prices. No live source exists that's both
   permitted and has real price data scrapable without a headless browser —
   don't re-research this from scratch, re-read this note first.
-- No analytics dashboards (Seaborn/Plotly demand heatmaps) — not started.
+- No Dash for analytics — deliberately substituted with Node aggregation +
+  React/Chart.js (see §6); Dash would mean a third server with its own
+  auth/deployment story for no real benefit. Seaborn's syllabus mention is
+  covered separately by `price_prediction/eda.py`, a data-science artifact
+  over the training set, not a live-serving path.
 - No depreciation forecasting, no agentic AI negotiation layer (spec's
   explicit Phase 2, not this project).
-- No client-side (React) automated tests yet — deferred, needs a separate
-  Vitest+Testing Library setup.
 - `condition_assessment` CNN is proof-of-concept (63 training images, 8
   classes) — not production quality. Don't cite its accuracy as reliable.
+- Client tests deliberately don't cover the data-fetching pages themselves
+  (Listings, ListingDetail, dashboards, Inquiries, Wishlist, Analytics) —
+  each needs its own service-mocking pass, skipped for time so far.
 
 ## 2. Architecture — exact request flow
 
@@ -122,11 +133,15 @@ POST /trust-score/
 ```
 
 Client-facing REST (Node, `/api/`): `auth/{register,login,me}`,
-`listings/{,mine,admin,:id}` (GET/POST/PATCH/DELETE),
+`listings/{,mine,admin,analytics,:id}` (GET/POST/PATCH/DELETE),
 `inquiries/{,:id/messages}`, `users/me/wishlist{,/:listingId}`.
-`listings/mine` and `listings/admin` are registered **before** `listings/:id`
-in the router — reordering breaks them (Express reads `"mine"`/`"admin"` as
-the `:id` param otherwise).
+`listings/mine`, `listings/admin`, and `listings/analytics` are registered
+**before** `listings/:id` in the router — reordering breaks them (Express
+reads them as the `:id` param otherwise). `GET /listings/analytics`
+(seller/admin only) returns `{ byBrand, byFuelType, byYear, byCondition }`,
+each an array of `{ <dimension>, avgPrice, count }` aggregated over
+`status: 'active'` listings only — flagged/sold/pending listings never
+skew the averages.
 
 ## 5. Trust Score Formula (`trust_score/scoring.py`)
 
@@ -153,7 +168,27 @@ Note: the three seller-bonus components max out at `1.0 + 0.5 + 1.0 = 2.5` —
 `MAX_SELLER_BONUS = 5.0` can never actually bind given current weights. Not
 a bug, just don't assume the cap is reachable if you change the weights.
 
-## 6. Critical DO NOTs
+## 6. Analytics Dashboard
+
+Spec says "Plotly/Dash" — built as Node aggregation + React/Chart.js
+instead, deliberately: Dash is a standalone Python web framework, and
+embedding it would mean a third server with its own auth/deployment story
+next to React/Node/Django, for a feature that's just charts over data Node
+already owns. `GET /api/listings/analytics` (seller/admin only) runs four
+real MongoDB aggregation pipelines (`$group`, `$bucket` for the condition-
+score ranges) over `status: 'active'` listings, rendered by `Analytics.jsx`.
+Grows/changes with the live marketplace — not a snapshot of training data.
+
+Seaborn's syllabus mention is `ml-service/price_prediction/eda.py`
+(`python -m price_prediction.eda`) instead — a data-science artifact over
+the training dataset (price-by-fuel-type, depreciation trend, price-vs-
+mileage, correlation heatmap), not a live-serving path. Its heatmap is
+worth rereading before touching `condition_score`'s role in price
+prediction: it shows a 0.81 correlation between `condition_score` and
+`year`, direct visual confirmation of the synthetic-proxy caveat already
+noted in `price_prediction/prepare_data.py`.
+
+## 7. Critical DO NOTs
 
 - **Don't let `server/.env` and `ml-service/.env`'s `JWT_SECRET` drift apart** — every Django ML call fails auth (401) the instant they differ.
 - **Don't recreate `ml-service/venv` with plain `python`** — must be `py -3.13`. TensorFlow has no Python 3.14 wheels; this is a real, tested constraint, not caution.
@@ -161,6 +196,7 @@ a bug, just don't assume the cap is reachable if you change the weights.
 - **Don't add a DRF `BaseAuthentication` subclass without `authenticate_header()`** — without it, DRF silently turns every 401 into 403 (bit us once already, see `core/authentication.py`).
 - **Don't replace the `SELLER_UPDATE_FIELDS` whitelist in `updateListing` with `Object.assign(listing, req.body)`** — that reopens the hole where any PATCH could overwrite `seller`, `ml`, or `_id`. Only admins may set `status`; sellers may not self-approve or self-unflag.
 - **Don't re-score a listing's ML fields on edit** — deliberate. A seller lowering a flagged listing's price does NOT auto-clear the flag; only an admin approving it does. If you change this, update `EditListing.jsx`'s warning text too.
-- **Don't commit raw Kaggle datasets, trained model artifacts, or `.env`/`.env.test` files** — all gitignored on purpose (license/size/secrets). See README's "Training data" section to regenerate.
+- **Don't commit raw Kaggle datasets or `.env`/`.env.test` files** — gitignored on purpose (license/secrets). Trained model artifacts (`*.joblib`, `*.keras`) are the one exception — those ARE committed deliberately (deployment needs working models on first boot); see README's "Training data" section.
+- **Don't build a Dash app for analytics** — the live seller dashboard is Node aggregation + React/Chart.js on purpose (§6's own reasoning); Seaborn's syllabus mention is `price_prediction/eda.py` instead, a separate report artifact.
 - **Don't run server tests with `fileParallelism: true`** — they share one real MongoDB test database (`valora_v1_test`); parallel files race on the `afterEach` cleanup (reproduced this exact failure once).
 - **Don't point `server/.env.test`'s `MONGODB_URI` at a non-`_test` database** — `tests/setup.js` throws on purpose rather than risk wiping dev/seed data.

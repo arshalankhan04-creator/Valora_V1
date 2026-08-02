@@ -96,6 +96,27 @@ this writing; `condition_assessment` is trained but proof-of-concept scale
 only — 63 images across 8 damage/part classes, expect low recall until a
 larger dataset is collected.
 
+## Analytics
+
+The spec calls for a "Plotly/Dash" analytics dashboard — built differently
+on purpose (see `CLAUDE.md` for the full reasoning): Dash is a standalone
+Python web framework, and bolting it on would mean a third server with its
+own auth/deployment story for no real benefit, when the project already
+has one React frontend.
+
+- **Live seller dashboard** (`/analytics` in the client, seller/admin only):
+  real-time price trends — by brand, fuel type, year (depreciation curve),
+  and condition-score bucket — aggregated over live Valora listings via
+  a real MongoDB aggregation pipeline (`GET /api/listings/analytics`,
+  `analyticsController.js`), rendered with Chart.js. Not historical
+  training data — this grows and changes as the actual marketplace does.
+- **EDA charts** (`python -m price_prediction.eda`, after `prepare_data.py`):
+  a Seaborn-based data-science artifact over the training dataset —
+  price-by-fuel-type, depreciation trend, price-vs-mileage, and a
+  correlation heatmap — satisfying the syllabus's actual Seaborn/heatmap
+  mention as a report/EDA deliverable rather than a live feature. Saves
+  PNGs to `price_prediction/eda_charts/` (gitignored, regenerate anytime).
+
 ## Testing
 
 ### server
@@ -106,10 +127,13 @@ npm test
 ```
 Vitest + Supertest, hitting a real Express app instance against a dedicated
 `valora_v1_test` MongoDB database (cleared between every test). ML service
-calls are mocked (`vi.mock('../src/services/mlService.js', ...)`), so these
-tests don't need Django running and stay deterministic regardless of model
-quality. Covers auth, listing CRUD/ownership/status-whitelisting, search
-filters, and wishlist idempotency. `npm run test:watch` for watch mode.
+and email calls are mocked (`vi.mock(...)`), so these tests don't need
+Django or a real SMTP server and stay deterministic regardless of model
+quality. 46 tests: auth (incl. the NoSQL-injection type-confusion fix),
+listing CRUD/ownership/status-whitelisting, search filters, wishlist
+idempotency, inquiry email notifications (both directions), and the
+market-analytics aggregation math (including that a flagged listing must
+be excluded from every average). `npm run test:watch` for watch mode.
 
 ### ml-service
 ```bash

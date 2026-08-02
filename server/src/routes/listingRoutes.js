@@ -8,15 +8,17 @@ import {
   updateListing,
   deleteListing,
 } from '../controllers/listingController.js'
+import { getMarketAnalytics } from '../controllers/analyticsController.js'
 import { protect, authorize } from '../middleware/auth.js'
 import { uploadListingImages } from '../middleware/upload.js'
 
 const router = Router()
 
 router.get('/', getListings)
-// Must come before /:id — otherwise Express matches "mine"/"admin" as the :id param.
+// Must come before /:id — otherwise Express matches "mine"/"admin"/"analytics" as the :id param.
 router.get('/mine', protect, authorize('seller', 'admin'), getMyListings)
 router.get('/admin', protect, authorize('admin'), getAdminListings)
+router.get('/analytics', protect, authorize('seller', 'admin'), getMarketAnalytics)
 router.get('/:id', getListingById)
 router.post(
   '/',

@@ -12,6 +12,7 @@ import SellerDashboard from '../pages/SellerDashboard'
 import Inquiries from '../pages/Inquiries'
 import AdminDashboard from '../pages/AdminDashboard'
 import Wishlist from '../pages/Wishlist'
+import Analytics from '../pages/Analytics'
 import NotFound from '../pages/NotFound'
 
 export default function AppRoutes() {
@@ -60,6 +61,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute roles={['seller', 'admin']}>
+              <Analytics />
             </ProtectedRoute>
           }
         />
