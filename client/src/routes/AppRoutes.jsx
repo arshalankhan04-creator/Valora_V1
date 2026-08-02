@@ -11,6 +11,7 @@ import EditListing from '../pages/EditListing'
 import SellerDashboard from '../pages/SellerDashboard'
 import Inquiries from '../pages/Inquiries'
 import AdminDashboard from '../pages/AdminDashboard'
+import Wishlist from '../pages/Wishlist'
 import NotFound from '../pages/NotFound'
 
 export default function AppRoutes() {
@@ -51,6 +52,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Inquiries />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
             </ProtectedRoute>
           }
         />

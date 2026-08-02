@@ -7,6 +7,7 @@ import { ASSET_BASE_URL } from '../services/api'
 import { formatPrice, formatKm } from '../utils/format'
 import TrustScoreBadge from '../components/TrustScoreBadge'
 import RiskFlagBadge from '../components/RiskFlagBadge'
+import WishlistButton from '../components/WishlistButton'
 
 export default function ListingDetail() {
   const { id } = useParams()
@@ -81,6 +82,7 @@ export default function ListingDetail() {
       <div className="flex items-center gap-2 mt-3">
         <TrustScoreBadge score={ml.trustScore} />
         <RiskFlagBadge flag={ml.riskFlag} />
+        <WishlistButton listingId={listing._id} />
       </div>
 
       {listing.description && <p className="text-gray-700 mt-4">{listing.description}</p>}

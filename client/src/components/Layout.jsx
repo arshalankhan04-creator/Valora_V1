@@ -20,6 +20,7 @@ export default function Layout() {
                   <Link to="/my-listings">My listings</Link>
                 </>
               )}
+              <Link to="/wishlist">Wishlist</Link>
               <Link to="/inquiries">Inquiries</Link>
               {user.role === 'admin' && <Link to="/admin">Admin</Link>}
               <button onClick={logout} className="text-gray-900">

@@ -3,6 +3,7 @@ import { ASSET_BASE_URL } from '../services/api'
 import { formatPrice, formatKm } from '../utils/format'
 import TrustScoreBadge from './TrustScoreBadge'
 import RiskFlagBadge from './RiskFlagBadge'
+import WishlistButton from './WishlistButton'
 
 export default function ListingCard({ listing }) {
   const thumbnail = listing.images?.[0]
@@ -28,6 +29,7 @@ export default function ListingCard({ listing }) {
           <h3 className="font-medium text-gray-900">
             {listing.brand} {listing.model} · {listing.year}
           </h3>
+          <WishlistButton listingId={listing._id} />
         </div>
         <p className="text-lg font-semibold text-gray-900 mt-1">{formatPrice(listing.price)}</p>
         <p className="text-sm text-gray-500">{formatKm(listing.kmDriven)} · {listing.fuelType} · {listing.transmission}</p>

@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
     // Seller-history inputs for the Trust Score API contract (§8, Valora_Team_Workflow.md)
     responseRate: { type: Number, default: 0 },
     pastDeals: { type: Number, default: 0 },
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
   },
   { timestamps: true },
 )
