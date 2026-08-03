@@ -1,15 +1,17 @@
+import { Badge } from './ui/badge'
+
 const STYLES = {
-  Low: 'bg-green-100 text-green-800',
-  Medium: 'bg-yellow-100 text-yellow-800',
-  High: 'bg-red-100 text-red-800',
+  Low: 'border-primary/20 bg-primary/10 text-primary',
+  Medium: 'border-secondary/50 bg-secondary/15 text-secondary-foreground',
+  High: 'border-destructive/20 bg-destructive/10 text-destructive',
 }
 
 export default function RiskFlagBadge({ flag }) {
   if (!flag) return null
 
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STYLES[flag] || 'bg-gray-100 text-gray-600'}`}>
+    <Badge variant="outline" className={STYLES[flag] || 'text-muted-foreground'}>
       {flag} risk
-    </span>
+    </Badge>
   )
 }

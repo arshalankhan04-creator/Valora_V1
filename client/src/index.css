@@ -1,5 +1,194 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-white text-gray-900;
+:root {
+  --background: hsl(45, 30%, 98%);
+  --foreground: hsl(150, 60%, 5%);
+
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(150, 60%, 5%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(150, 60%, 5%);
+
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(45, 30%, 98%);
+  --secondary: hsl(48, 96%, 53%);
+  --secondary-foreground: hsl(150, 60%, 5%);
+
+  --muted: hsl(45, 20%, 94%);
+  --muted-foreground: hsl(150, 10%, 40%);
+  --accent: hsl(142, 70%, 92%);
+  --accent-foreground: hsl(142, 76%, 30%);
+
+  /* Nudged from hsl(0, 84%, 60%) — the original sat close enough to the
+     WCAG AA threshold against white foreground text to want a safety
+     margin (see DESIGN_SYSTEM_DECISIONS.md §3.3). */
+  --destructive: hsl(0, 84%, 54%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+
+  --border: hsl(150, 20%, 90%);
+  --input: hsl(150, 20%, 90%);
+  --ring: hsl(142, 76%, 36%);
+
+  --chart-1: hsl(142, 76%, 36%);
+  --chart-2: hsl(48, 96%, 53%);
+  /* Lightened from hsl(150, 60%, 15%) — was notably darker than the other
+     four series colors, risking it visually disappearing in a chart
+     (see DESIGN_SYSTEM_DECISIONS.md §3.4). */
+  --chart-3: hsl(190, 70%, 42%);
+  --chart-4: hsl(200, 80%, 50%);
+  --chart-5: hsl(25, 95%, 60%);
+
+  --sidebar: hsl(150, 30%, 12%);
+  --sidebar-foreground: hsl(45, 30%, 98%);
+  --sidebar-primary: hsl(142, 76%, 36%);
+  --sidebar-primary-foreground: hsl(45, 30%, 98%);
+  --sidebar-accent: hsl(150, 30%, 18%);
+  --sidebar-accent-foreground: hsl(48, 96%, 53%);
+  --sidebar-border: hsl(150, 30%, 20%);
+  --sidebar-ring: hsl(142, 76%, 36%);
+
+  --radius: 1.25rem;
+
+  --font-sans-family: Outfit, system-ui, sans-serif;
+  --font-mono-family: JetBrains Mono, monospace;
+  --font-serif-family: Georgia, serif;
+  --letter-spacing: -0.03em;
+
+  --shadow-color: hsl(142, 76%, 10%);
+  --shadow-opacity: 0.1;
+  --shadow-blur: 30px;
+  --shadow-spread: 0px;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 10px;
+}
+
+/* Dark mode tokens — defined for future use, not wired up via `dark:`
+   variants anywhere yet. See DESIGN_SYSTEM_DECISIONS.md §2. */
+.dark {
+  --background: hsl(150, 30%, 3%);
+  --foreground: hsl(45, 20%, 95%);
+
+  --card: hsl(150, 30%, 6%);
+  --card-foreground: hsl(45, 20%, 95%);
+  --popover: hsl(150, 30%, 5%);
+  --popover-foreground: hsl(45, 20%, 95%);
+
+  --primary: hsl(142, 70%, 50%);
+  --primary-foreground: hsl(150, 30%, 3%);
+  --secondary: hsl(48, 90%, 55%);
+  --secondary-foreground: hsl(150, 30%, 3%);
+
+  --muted: hsl(150, 20%, 12%);
+  --muted-foreground: hsl(150, 10%, 70%);
+  --accent: hsl(142, 50%, 15%);
+  --accent-foreground: hsl(142, 70%, 50%);
+
+  --destructive: hsl(0, 80%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  --border: hsl(150, 20%, 15%);
+  --input: hsl(150, 20%, 15%);
+  --ring: hsl(142, 70%, 50%);
+
+  --chart-1: hsl(142, 70%, 50%);
+  --chart-2: hsl(48, 90%, 55%);
+  --chart-3: hsl(190, 80%, 60%);
+  --chart-4: hsl(280, 70%, 65%);
+  --chart-5: hsl(10, 85%, 60%);
+
+  --sidebar: hsl(150, 40%, 2%);
+  --sidebar-foreground: hsl(45, 20%, 95%);
+  --sidebar-primary: hsl(142, 70%, 50%);
+  --sidebar-primary-foreground: hsl(150, 30%, 3%);
+  --sidebar-accent: hsl(150, 30%, 10%);
+  --sidebar-accent-foreground: hsl(48, 90%, 55%);
+  --sidebar-border: hsl(150, 20%, 12%);
+  --sidebar-ring: hsl(142, 70%, 50%);
+
+  --radius: 1.25rem;
+
+  --letter-spacing: -0.02em;
+
+  --shadow-color: hsl(0, 0%, 0%);
+  --shadow-opacity: 0.6;
+  --shadow-blur: 50px;
+  --shadow-spread: -10px;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 25px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Real Tailwind v4 namespaces (--font-*, --radius-*, --shadow-*,
+     --tracking-*) — corrected from the supplied theme's --color-*
+     prefixes, which would not have generated working font/radius/shadow
+     utilities. See the note above this file's diff. */
+  --font-sans: var(--font-sans-family);
+  --font-mono: var(--font-mono-family);
+  --font-serif: var(--font-serif-family);
+
+  /* Derived scale from the single --radius token — badges/small buttons
+     use less rounding than cards/dialogs rather than one flat value
+     everywhere (DESIGN_SYSTEM_DECISIONS.md §3.1). */
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* One tinted, composed shadow — becomes the `shadow-brand` utility. */
+  --shadow-brand: var(--shadow-offset-x) var(--shadow-offset-y) var(--shadow-blur)
+    var(--shadow-spread) hsl(from var(--shadow-color) h s l / var(--shadow-opacity));
+
+  /* Scoped to headings only, not applied globally to body text
+     (DESIGN_SYSTEM_DECISIONS.md §3.2). */
+  --tracking-brand: var(--letter-spacing);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: var(--color-ring);
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-brand;
+  }
 }

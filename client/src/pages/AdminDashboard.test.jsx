@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import * as listingsService from '../services/listings'
 import AdminDashboard from './AdminDashboard'
+import { Toaster } from '../components/ui/sonner'
 
 vi.mock('../services/listings', () => ({
   getAdminListings: vi.fn(),
@@ -20,6 +21,7 @@ function renderDashboard() {
   return render(
     <MemoryRouter>
       <AdminDashboard />
+      <Toaster />
     </MemoryRouter>,
   )
 }
@@ -81,27 +83,26 @@ describe('AdminDashboard', () => {
   })
 
   describe('remove', () => {
-    afterEach(() => vi.restoreAllMocks())
-
-    it('does nothing if the confirmation is declined', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(false)
+    it('does nothing if the confirmation dialog is cancelled', async () => {
       listingsService.getAdminListings.mockResolvedValue([PENDING])
       renderDashboard()
       await screen.findByText('Honda City · 2021')
 
       await userEvent.click(screen.getByRole('button', { name: 'Remove' }))
+      await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
 
       expect(listingsService.deleteListing).not.toHaveBeenCalled()
     })
 
     it('removes the listing from the list on confirm', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
       listingsService.getAdminListings.mockResolvedValue([PENDING])
       listingsService.deleteListing.mockResolvedValue()
       renderDashboard()
       await screen.findByText('Honda City · 2021')
 
       await userEvent.click(screen.getByRole('button', { name: 'Remove' }))
+      const dialog = await screen.findByRole('alertdialog')
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
 
       expect(listingsService.deleteListing).toHaveBeenCalledWith('l1')
       expect(await screen.findByText('No listings match this filter.')).toBeInTheDocument()

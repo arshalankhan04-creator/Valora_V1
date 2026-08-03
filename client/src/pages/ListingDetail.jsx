@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { animate } from 'framer-motion'
 import { getListing } from '../services/listings'
 import { createInquiry } from '../services/inquiries'
 import { useAuth } from '../context/AuthContext'
@@ -8,6 +9,36 @@ import { formatPrice, formatKm } from '../utils/format'
 import TrustScoreBadge from '../components/TrustScoreBadge'
 import RiskFlagBadge from '../components/RiskFlagBadge'
 import WishlistButton from '../components/WishlistButton'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '../components/ui/button'
+import { Textarea } from '../components/ui/textarea'
+import { Skeleton } from '../components/ui/skeleton'
+
+function AnimatedTrustScore({ value }) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    const controls = animate(0, value, {
+      duration: 1,
+      ease: 'easeOut',
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [value])
+
+  return <span>{display}</span>
+}
+
+function BreakdownRow({ label, value, max }) {
+  return (
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-foreground">
+        {value?.toFixed(1) ?? '—'} <span className="text-muted-foreground">/ {max}</span>
+      </span>
+    </div>
+  )
+}
 
 export default function ListingDetail() {
   const { id } = useParams()
@@ -41,131 +72,177 @@ export default function ListingDetail() {
     }
   }
 
-  if (loading) return <p className="px-6 py-12 text-gray-500">Loading...</p>
-  if (error || !listing) return <p className="px-6 py-12 text-red-600">{error || 'Not found'}</p>
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-4xl px-6 py-8">
+        <span className="sr-only">Loading...</span>
+        <Skeleton className="mb-6 aspect-video w-full rounded-lg" />
+        <Skeleton className="h-8 w-2/3" />
+        <Skeleton className="mt-3 h-4 w-1/2" />
+      </section>
+    )
+  }
+  if (error || !listing) return <p className="px-6 py-12 text-destructive">{error || 'Not found'}</p>
 
   const ml = listing.ml || {}
   const isOwnListing = user?.id === listing.seller?._id
   const canContactSeller = user && user.role !== 'admin' && !isOwnListing
 
   return (
-    <section className="px-6 py-8 max-w-4xl mx-auto">
+    <section className="mx-auto max-w-4xl px-6 py-8">
       {listing.images?.length > 0 ? (
-        <div className="grid grid-cols-3 gap-2 mb-6">
+        <div className="mb-6 grid grid-cols-3 gap-2">
           {listing.images.map((img) => (
             <img
               key={img}
               src={`${ASSET_BASE_URL}/${img}`}
               alt={`${listing.brand} ${listing.model}`}
-              className="w-full aspect-video object-cover rounded-lg"
+              className="aspect-video w-full rounded-lg object-cover"
             />
           ))}
         </div>
       ) : (
-        <div className="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center mb-6 text-gray-400">
+        <div className="mb-6 flex aspect-video w-full items-center justify-center rounded-lg bg-muted text-muted-foreground">
           No photos
         </div>
       )}
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             {listing.brand} {listing.model} · {listing.year}
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="mt-1 text-muted-foreground">
             {formatKm(listing.kmDriven)} · {listing.fuelType} · {listing.transmission}
           </p>
         </div>
-        <p className="text-2xl font-semibold text-gray-900 whitespace-nowrap">{formatPrice(listing.price)}</p>
+        <p className="whitespace-nowrap text-2xl font-bold text-foreground">{formatPrice(listing.price)}</p>
       </div>
 
-      <div className="flex items-center gap-2 mt-3">
+      <div className="mt-3 flex items-center gap-2">
         <TrustScoreBadge score={ml.trustScore} />
         <RiskFlagBadge flag={ml.riskFlag} />
         <WishlistButton listingId={listing._id} />
       </div>
 
-      {listing.description && <p className="text-gray-700 mt-4">{listing.description}</p>}
+      {listing.description && <p className="mt-4 text-foreground/90">{listing.description}</p>}
 
-      <div className="grid sm:grid-cols-2 gap-4 mt-8">
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h2 className="font-medium text-gray-900 mb-2">Fair price check</h2>
-          {ml.predictedPriceMin != null ? (
-            <p className="text-sm text-gray-600">
-              Predicted range: {formatPrice(ml.predictedPriceMin)} – {formatPrice(ml.predictedPriceMax)}
-              {ml.confidenceLevel && <> ({ml.confidenceLevel} confidence)</>}
-            </p>
-          ) : (
-            <p className="text-sm text-gray-400">Not yet scored</p>
-          )}
-        </div>
+      <div className="mt-8 grid gap-4">
+        {ml.trustScore != null && (
+          <Card className="shadow-brand/60">
+            <CardHeader>
+              <CardTitle className="text-base">Trust Score</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+              <div className="text-5xl font-bold text-primary">
+                <AnimatedTrustScore value={ml.trustScore} />
+                <span className="text-2xl text-muted-foreground">/100</span>
+              </div>
+              <div className="flex-1 space-y-1.5">
+                <BreakdownRow label="Price fairness" value={ml.trustBreakdown?.priceFairness} max={40} />
+                <BreakdownRow label="Fraud risk" value={ml.trustBreakdown?.fraudRisk} max={30} />
+                <BreakdownRow label="Condition match" value={ml.trustBreakdown?.conditionMatch} max={30} />
+                <BreakdownRow label="Seller factor" value={ml.trustBreakdown?.sellerFactor} max={5} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h2 className="font-medium text-gray-900 mb-2">Fraud risk</h2>
-          {ml.riskFlag ? (
-            <>
-              <p className="text-sm text-gray-600">{ml.riskFlag} risk ({Math.round((ml.fraudProbability ?? 0) * 100)}% probability)</p>
-              {ml.fraudReasons?.length > 0 && (
-                <ul className="text-sm text-gray-500 list-disc list-inside mt-1">
-                  {ml.fraudReasons.map((reason) => <li key={reason}>{reason}</li>)}
-                </ul>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-gray-400">Not yet scored</p>
-          )}
-        </div>
-
-        <div className="border border-gray-200 rounded-lg p-4 sm:col-span-2">
-          <h2 className="font-medium text-gray-900 mb-2">Condition assessment</h2>
-          {ml.visualConditionScore != null ? (
-            <>
-              <p className="text-sm text-gray-600">Visual condition score: {ml.visualConditionScore}/100</p>
-              {ml.detectedDamages?.length > 0 ? (
-                <ul className="text-sm text-gray-500 list-disc list-inside mt-1">
-                  {ml.detectedDamages.map((d, i) => (
-                    <li key={i}>{d.damageType} on {d.part.replace(/_/g, ' ')} ({Math.round(d.confidence * 100)}% confidence)</li>
-                  ))}
-                </ul>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Fair price check</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {ml.predictedPriceMin != null ? (
+                <p className="text-sm text-muted-foreground">
+                  Predicted range: {formatPrice(ml.predictedPriceMin)} – {formatPrice(ml.predictedPriceMax)}
+                  {ml.confidenceLevel && <> ({ml.confidenceLevel} confidence)</>}
+                </p>
               ) : (
-                <p className="text-sm text-gray-500">No damage detected from photos</p>
+                <p className="text-sm text-muted-foreground">Not yet scored</p>
               )}
-            </>
-          ) : (
-            <p className="text-sm text-gray-400">No photos to assess</p>
-          )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Fraud risk</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {ml.riskFlag ? (
+                <>
+                  <p className="text-sm text-muted-foreground">
+                    {ml.riskFlag} risk ({Math.round((ml.fraudProbability ?? 0) * 100)}% probability)
+                  </p>
+                  {ml.fraudReasons?.length > 0 && (
+                    <ul className="mt-1 list-inside list-disc text-sm text-muted-foreground">
+                      {ml.fraudReasons.map((reason) => <li key={reason}>{reason}</li>)}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">Not yet scored</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="sm:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-base">Condition assessment</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {ml.visualConditionScore != null ? (
+                <>
+                  <p className="text-sm text-muted-foreground">
+                    Visual condition score: {ml.visualConditionScore}/100
+                  </p>
+                  {ml.detectedDamages?.length > 0 ? (
+                    <ul className="mt-1 list-inside list-disc text-sm text-muted-foreground">
+                      {ml.detectedDamages.map((d, i) => (
+                        <li key={i}>{d.damageType} on {d.part.replace(/_/g, ' ')} ({Math.round(d.confidence * 100)}% confidence)</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No damage detected from photos</p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No photos to assess</p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      <div className="border-t border-gray-200 mt-8 pt-6">
-        <h2 className="font-medium text-gray-900 mb-3">Seller</h2>
-        <p className="text-gray-700">{listing.seller?.name}</p>
+      <div className="mt-8 border-t border-border pt-6">
+        <h2 className="mb-3 font-semibold text-foreground">Seller</h2>
+        <p className="text-foreground/90">{listing.seller?.name}</p>
 
         {canContactSeller && !sent && (
-          <form onSubmit={handleContactSeller} className="mt-4 flex flex-col gap-2 max-w-md">
-            <textarea
+          <form onSubmit={handleContactSeller} className="mt-4 flex max-w-md flex-col gap-2">
+            <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Ask the seller a question..."
-              className="border border-gray-300 rounded px-3 py-2 text-sm"
               rows={3}
               required
             />
-            <button
-              type="submit"
-              disabled={sending}
-              className="bg-gray-900 text-white rounded px-3 py-2 text-sm self-start disabled:opacity-50"
-            >
+            <Button type="submit" disabled={sending} className="self-start">
               {sending ? 'Sending...' : 'Contact seller'}
-            </button>
+            </Button>
           </form>
         )}
         {sent && (
-          <p className="text-green-700 text-sm mt-4">
+          <p className="mt-4 text-sm text-primary">
             Message sent. View it in <Link to="/inquiries" className="underline">your inquiries</Link>.
           </p>
         )}
-        {!user && <p className="text-gray-500 text-sm mt-4"><Link to="/login" className="underline">Log in</Link> to contact the seller.</p>}
+        {!user && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            <Link to="/login" className="underline">Log in</Link> to contact the seller.
+          </p>
+        )}
       </div>
     </section>
   )

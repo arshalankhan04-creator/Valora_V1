@@ -1,26 +1,25 @@
+import { Badge } from './ui/badge'
+
 const TIERS = [
-  { min: 75, label: 'High trust', className: 'bg-green-100 text-green-800' },
-  { min: 50, label: 'Medium trust', className: 'bg-yellow-100 text-yellow-800' },
-  { min: 0, label: 'Low trust', className: 'bg-red-100 text-red-800' },
+  { min: 75, label: 'High trust', className: 'border-primary/20 bg-primary/10 text-primary' },
+  { min: 50, label: 'Medium trust', className: 'border-secondary/50 bg-secondary/15 text-secondary-foreground' },
+  { min: 0, label: 'Low trust', className: 'border-destructive/20 bg-destructive/10 text-destructive' },
 ]
 
 export default function TrustScoreBadge({ score }) {
   if (score == null) {
     return (
-      <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-600 px-2.5 py-0.5 text-xs font-medium">
+      <Badge variant="outline" className="text-muted-foreground">
         Not yet scored
-      </span>
+      </Badge>
     )
   }
 
   const tier = TIERS.find((t) => score >= t.min)
 
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${tier.className}`}
-      title={tier.label}
-    >
+    <Badge variant="outline" title={tier.label} className={tier.className}>
       Trust {Math.round(score)}
-    </span>
+    </Badge>
   )
 }

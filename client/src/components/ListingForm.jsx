@@ -1,7 +1,14 @@
 import { useState } from 'react'
+import { Upload } from 'lucide-react'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Textarea } from './ui/textarea'
+import { Label } from './ui/label'
 
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'CNG', 'LPG', 'Hybrid']
 const TRANSMISSIONS = ['Manual', 'Automatic']
+const SELECT_CLASS =
+  'h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
 
 export const EMPTY_LISTING_FORM = {
   brand: '',
@@ -38,99 +45,89 @@ export default function ListingForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
-        <input
+        <Input
           type="text"
           placeholder="Brand"
           value={form.brand}
           onChange={handleChange('brand')}
-          className="border border-gray-300 rounded px-3 py-2"
           required
         />
-        <input
+        <Input
           type="text"
           placeholder="Model"
           value={form.model}
           onChange={handleChange('model')}
-          className="border border-gray-300 rounded px-3 py-2"
           required
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <input
+        <Input
           type="number"
           placeholder="Year"
           value={form.year}
           onChange={handleChange('year')}
-          className="border border-gray-300 rounded px-3 py-2"
           required
         />
-        <input
+        <Input
           type="number"
           placeholder="Km driven"
           value={form.kmDriven}
           onChange={handleChange('kmDriven')}
-          className="border border-gray-300 rounded px-3 py-2"
           required
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <select
-          value={form.fuelType}
-          onChange={handleChange('fuelType')}
-          className="border border-gray-300 rounded px-3 py-2"
-        >
+        <select value={form.fuelType} onChange={handleChange('fuelType')} className={SELECT_CLASS}>
           {FUEL_TYPES.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
-        <select
-          value={form.transmission}
-          onChange={handleChange('transmission')}
-          className="border border-gray-300 rounded px-3 py-2"
-        >
+        <select value={form.transmission} onChange={handleChange('transmission')} className={SELECT_CLASS}>
           {TRANSMISSIONS.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
-      <input
+      <Input
         type="number"
         placeholder="Asking price (INR)"
         value={form.price}
         onChange={handleChange('price')}
-        className="border border-gray-300 rounded px-3 py-2"
         required
       />
 
-      <textarea
+      <Textarea
         placeholder="Description"
         value={form.description}
         onChange={handleChange('description')}
-        className="border border-gray-300 rounded px-3 py-2"
         rows={3}
       />
 
       {showImages && (
-        <div>
-          <label className="block text-sm text-gray-600 mb-1">Photos (up to 8)</label>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="listing-photos">Photos (up to 8)</Label>
+          <label
+            htmlFor="listing-photos"
+            className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-input px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-ring hover:text-foreground"
+          >
+            <Upload className="size-4" />
+            {images.length > 0 ? `${images.length} photo${images.length > 1 ? 's' : ''} selected` : 'Choose photos'}
+          </label>
           <input
+            id="listing-photos"
             type="file"
             accept="image/*"
             multiple
             onChange={(e) => setImages(Array.from(e.target.files).slice(0, 8))}
-            className="text-sm"
+            className="sr-only"
           />
         </div>
       )}
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="bg-gray-900 text-white rounded px-3 py-2 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={submitting}>
         {submitting ? submittingLabel : submitLabel}
-      </button>
+      </Button>
     </form>
   )
 }

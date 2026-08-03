@@ -1,8 +1,22 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { getListings } from '../services/listings'
 import ListingCard from '../components/ListingCard'
+import { Input } from '../components/ui/input'
+import { Skeleton } from '../components/ui/skeleton'
 
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'CNG', 'LPG', 'Hybrid']
+const SELECT_CLASS =
+  'h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
+
+const gridVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+}
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0 },
+}
 
 export default function Listings() {
   const [filters, setFilters] = useState({
@@ -47,98 +61,63 @@ export default function Listings() {
   }
 
   return (
-    <section className="px-6 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-4">Listings</h1>
+    <section className="mx-auto max-w-6xl px-6 py-10">
+      <h1 className="text-3xl font-bold text-foreground">Listings</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Every car below has already been checked for a fair price, fraud risk, and condition.
+      </p>
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Brand"
-          value={filters.brand}
-          onChange={handleFilterChange('brand')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-        />
-        <input
-          type="text"
-          placeholder="Model"
-          value={filters.model}
-          onChange={handleFilterChange('model')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-        />
-        <select
-          value={filters.fuelType}
-          onChange={handleFilterChange('fuelType')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-        >
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Input placeholder="Brand" value={filters.brand} onChange={handleFilterChange('brand')} className="w-32" />
+        <Input placeholder="Model" value={filters.model} onChange={handleFilterChange('model')} className="w-32" />
+        <select value={filters.fuelType} onChange={handleFilterChange('fuelType')} className={SELECT_CLASS}>
           <option value="">Any fuel type</option>
           {FUEL_TYPES.map((f) => (
             <option key={f} value={f}>{f}</option>
           ))}
         </select>
-        <input
-          type="number"
-          placeholder="Min price"
-          value={filters.minPrice}
-          onChange={handleFilterChange('minPrice')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32"
-        />
-        <input
-          type="number"
-          placeholder="Max price"
-          value={filters.maxPrice}
-          onChange={handleFilterChange('maxPrice')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-32"
-        />
-        <input
-          type="number"
-          placeholder="Min year"
-          value={filters.minYear}
-          onChange={handleFilterChange('minYear')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
-        />
-        <input
-          type="number"
-          placeholder="Max year"
-          value={filters.maxYear}
-          onChange={handleFilterChange('maxYear')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
-        />
-        <input
-          type="number"
-          placeholder="Min km"
-          value={filters.minKm}
-          onChange={handleFilterChange('minKm')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
-        />
-        <input
-          type="number"
-          placeholder="Max km"
-          value={filters.maxKm}
-          onChange={handleFilterChange('maxKm')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm w-28"
-        />
-        <select
-          value={filters.minTrustScore}
-          onChange={handleFilterChange('minTrustScore')}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-        >
+        <Input type="number" placeholder="Min price" value={filters.minPrice} onChange={handleFilterChange('minPrice')} className="w-28" />
+        <Input type="number" placeholder="Max price" value={filters.maxPrice} onChange={handleFilterChange('maxPrice')} className="w-28" />
+        <Input type="number" placeholder="Min year" value={filters.minYear} onChange={handleFilterChange('minYear')} className="w-24" />
+        <Input type="number" placeholder="Max year" value={filters.maxYear} onChange={handleFilterChange('maxYear')} className="w-24" />
+        <Input type="number" placeholder="Min km" value={filters.minKm} onChange={handleFilterChange('minKm')} className="w-24" />
+        <Input type="number" placeholder="Max km" value={filters.maxKm} onChange={handleFilterChange('maxKm')} className="w-24" />
+        <select value={filters.minTrustScore} onChange={handleFilterChange('minTrustScore')} className={SELECT_CLASS}>
           <option value="">Any trust score</option>
           <option value="75">75+ (High)</option>
           <option value="50">50+ (Medium)</option>
         </select>
       </div>
 
-      {loading && <p className="text-gray-500">Loading listings...</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      {loading && (
+        <div aria-live="polite" className="mt-8">
+          <span className="sr-only">Loading listings...</span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-72 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      )}
+      {error && <p className="mt-8 text-destructive">{error}</p>}
       {!loading && !error && listings.length === 0 && (
-        <p className="text-gray-500">No listings match these filters.</p>
+        <p className="mt-8 text-muted-foreground">No listings match these filters.</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {listings.map((listing) => (
-          <ListingCard key={listing._id} listing={listing} />
-        ))}
-      </div>
+      {!loading && !error && listings.length > 0 && (
+        <motion.div
+          variants={gridVariants}
+          initial="hidden"
+          animate="show"
+          className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {listings.map((listing) => (
+            <motion.div key={listing._id} variants={cardVariants}>
+              <ListingCard listing={listing} />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </section>
   )
 }

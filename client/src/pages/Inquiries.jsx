@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
+import { Send } from 'lucide-react'
 import { getMyInquiries, addMessage } from '../services/inquiries'
 import { useAuth } from '../context/AuthContext'
 import { formatPrice } from '../utils/format'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Avatar, AvatarFallback } from '../components/ui/avatar'
+import { Skeleton } from '../components/ui/skeleton'
+import { cn } from '../lib/utils'
 
 export default function Inquiries() {
   const { user } = useAuth()
@@ -35,24 +41,42 @@ export default function Inquiries() {
     }
   }
 
-  if (loading) return <p className="px-6 py-12 text-gray-500">Loading...</p>
+  if (loading) {
+    return (
+      <section className="mx-auto flex max-w-4xl gap-6 px-6 py-8">
+        <span className="sr-only">Loading...</span>
+        <Skeleton className="h-96 w-56 flex-shrink-0 rounded-lg" />
+        <Skeleton className="h-96 flex-1 rounded-lg" />
+      </section>
+    )
+  }
   if (inquiries.length === 0) {
-    return <p className="px-6 py-12 text-gray-500">No inquiries yet.</p>
+    return <p className="px-6 py-12 text-muted-foreground">No inquiries yet.</p>
   }
 
   return (
-    <section className="px-6 py-8 flex gap-6 max-w-4xl mx-auto">
-      <ul className="w-56 flex-shrink-0 border border-gray-200 rounded-lg divide-y divide-gray-200">
+    <section className="mx-auto flex max-w-4xl gap-6 px-6 py-8">
+      <ul className="w-56 flex-shrink-0 divide-y divide-border rounded-lg border border-border bg-card">
         {inquiries.map((inquiry) => {
           const otherParty = inquiry.buyer?._id === user.id ? inquiry.seller : inquiry.buyer
           return (
             <li key={inquiry._id}>
               <button
                 onClick={() => setSelectedId(inquiry._id)}
-                className={`w-full text-left px-3 py-2 text-sm ${inquiry._id === selectedId ? 'bg-gray-100' : ''}`}
+                className={cn(
+                  'flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
+                  inquiry._id === selectedId ? 'bg-accent' : 'hover:bg-accent/50',
+                )}
               >
-                <p className="font-medium text-gray-900">{inquiry.listing?.brand} {inquiry.listing?.model}</p>
-                <p className="text-gray-500 text-xs">with {otherParty?.name}</p>
+                <Avatar size="sm">
+                  <AvatarFallback className="bg-primary/10 text-xs text-primary">
+                    {otherParty?.name?.[0]?.toUpperCase() ?? '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-foreground">{inquiry.listing?.brand} {inquiry.listing?.model}</p>
+                  <p className="truncate text-xs text-muted-foreground">with {otherParty?.name}</p>
+                </div>
               </button>
             </li>
           )
@@ -60,20 +84,23 @@ export default function Inquiries() {
       </ul>
 
       {selected && (
-        <div className="flex-1 border border-gray-200 rounded-lg p-4 flex flex-col">
-          <div className="border-b border-gray-200 pb-3 mb-3">
-            <p className="font-medium text-gray-900">
+        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card p-4">
+          <div className="mb-3 border-b border-border pb-3">
+            <p className="font-medium text-foreground">
               {selected.listing?.brand} {selected.listing?.model} · {formatPrice(selected.listing?.price)}
             </p>
           </div>
 
-          <div className="flex-1 flex flex-col gap-2 mb-4">
+          <div className="mb-4 flex flex-1 flex-col gap-2">
             {selected.messages.map((msg) => {
               const fromMe = msg.sender === user.id || msg.sender?._id === user.id
               return (
                 <div
                   key={msg._id}
-                  className={`max-w-xs px-3 py-2 rounded-lg text-sm ${fromMe ? 'self-end bg-gray-900 text-white' : 'self-start bg-gray-100 text-gray-900'}`}
+                  className={cn(
+                    'max-w-xs rounded-lg px-3 py-2 text-sm',
+                    fromMe ? 'self-end bg-primary text-primary-foreground' : 'self-start bg-muted text-foreground',
+                  )}
                 >
                   {msg.text}
                 </div>
@@ -82,20 +109,16 @@ export default function Inquiries() {
           </div>
 
           <form onSubmit={handleReply} className="flex gap-2">
-            <input
+            <Input
               type="text"
               value={reply}
               onChange={(e) => setReply(e.target.value)}
               placeholder="Type a reply..."
-              className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+              className="flex-1"
             />
-            <button
-              type="submit"
-              disabled={sending}
-              className="bg-gray-900 text-white rounded px-3 py-2 text-sm disabled:opacity-50"
-            >
-              Send
-            </button>
+            <Button type="submit" disabled={sending} size="icon" aria-label="Send">
+              <Send className="size-4" />
+            </Button>
           </form>
         </div>
       )}

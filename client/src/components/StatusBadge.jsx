@@ -1,14 +1,16 @@
+import { Badge } from './ui/badge'
+
 const STATUS_STYLES = {
-  pending_review: 'bg-gray-100 text-gray-700',
-  active: 'bg-green-100 text-green-800',
-  flagged: 'bg-red-100 text-red-800',
-  sold: 'bg-blue-100 text-blue-800',
+  pending_review: 'border-border bg-muted text-muted-foreground',
+  active: 'border-primary/20 bg-primary/10 text-primary',
+  flagged: 'border-destructive/20 bg-destructive/10 text-destructive',
+  sold: 'border-chart-4/30 bg-chart-4/10 text-chart-4',
 }
 
 export default function StatusBadge({ status }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[status] || 'bg-gray-100 text-gray-600'}`}>
+    <Badge variant="outline" className={STATUS_STYLES[status] || 'text-muted-foreground'}>
       {status.replace('_', ' ')}
-    </span>
+    </Badge>
   )
 }

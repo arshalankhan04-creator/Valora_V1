@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
@@ -22,33 +25,45 @@ export default function Login() {
   }
 
   return (
-    <section className="max-w-sm mx-auto px-6 py-12">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Log in</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-          required
-        />
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button
-          type="submit"
-          className="bg-gray-900 text-white rounded px-3 py-2"
-        >
+    <section className="mx-auto max-w-sm px-6 py-16">
+      <h1 className="text-3xl font-bold text-foreground">Log in</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Welcome back — pick up where you left off.
+      </p>
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="login-email">Email</Label>
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="login-password">Password</Label>
+          <Input
+            id="login-password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+        </div>
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" className="mt-2">
           Log in
-        </button>
+        </Button>
       </form>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        New to Valora?{' '}
+        <Link to="/register" className="font-medium text-primary hover:underline">
+          Create an account
+        </Link>
+      </p>
     </section>
   )
 }

@@ -27,8 +27,8 @@ export default function CreateListing() {
   }
 
   return (
-    <section className="px-6 py-8 max-w-lg mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">List your car</h1>
+    <section className="mx-auto max-w-lg px-6 py-8">
+      <h1 className="mb-6 text-2xl font-bold text-foreground">List your car</h1>
       <ListingForm
         onSubmit={handleSubmit}
         submitting={submitting}

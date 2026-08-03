@@ -11,29 +11,31 @@ export default function ListingCard({ listing }) {
   return (
     <Link
       to={`/listings/${listing._id}`}
-      className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-brand"
     >
-      <div className="aspect-video bg-gray-100 flex items-center justify-center">
+      <div className="flex aspect-video items-center justify-center overflow-hidden bg-muted">
         {thumbnail ? (
           <img
             src={`${ASSET_BASE_URL}/${thumbnail}`}
             alt={`${listing.brand} ${listing.model}`}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <span className="text-gray-400 text-sm">No photo</span>
+          <span className="text-sm text-muted-foreground">No photo</span>
         )}
       </div>
-      <div className="p-4">
+      <div className="flex flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-medium text-gray-900">
+          <h3 className="font-semibold text-foreground">
             {listing.brand} {listing.model} · {listing.year}
           </h3>
           <WishlistButton listingId={listing._id} />
         </div>
-        <p className="text-lg font-semibold text-gray-900 mt-1">{formatPrice(listing.price)}</p>
-        <p className="text-sm text-gray-500">{formatKm(listing.kmDriven)} · {listing.fuelType} · {listing.transmission}</p>
-        <div className="flex items-center gap-2 mt-3">
+        <p className="text-lg font-semibold text-foreground">{formatPrice(listing.price)}</p>
+        <p className="text-sm text-muted-foreground">
+          {formatKm(listing.kmDriven)} · {listing.fuelType} · {listing.transmission}
+        </p>
+        <div className="flex items-center gap-2 pt-1">
           <TrustScoreBadge score={listing.ml?.trustScore} />
           <RiskFlagBadge flag={listing.ml?.riskFlag} />
         </div>

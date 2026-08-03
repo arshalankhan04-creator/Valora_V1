@@ -22,13 +22,13 @@ export default function EditListing() {
       .finally(() => setLoading(false))
   }, [id])
 
-  if (loading) return <p className="px-6 py-12 text-gray-500">Loading...</p>
-  if (loadError) return <p className="px-6 py-12 text-red-600">{loadError}</p>
+  if (loading) return <p className="px-6 py-12 text-muted-foreground">Loading...</p>
+  if (loadError) return <p className="px-6 py-12 text-destructive">{loadError}</p>
 
   const sellerId = listing.seller?._id || listing.seller
   const isOwner = sellerId === user.id
   if (!isOwner && user.role !== 'admin') {
-    return <p className="px-6 py-12 text-red-600">This isn't your listing to edit.</p>
+    return <p className="px-6 py-12 text-destructive">This isn't your listing to edit.</p>
   }
 
   const initialValues = {
@@ -56,9 +56,9 @@ export default function EditListing() {
   }
 
   return (
-    <section className="px-6 py-8 max-w-lg mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-2">Edit listing</h1>
-      <p className="text-sm text-gray-500 mb-6">
+    <section className="mx-auto max-w-lg px-6 py-8">
+      <h1 className="mb-2 text-2xl font-bold text-foreground">Edit listing</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
         Changing details here won't re-run the price, fraud, or condition analysis — if this
         listing is flagged, it stays flagged until an admin reviews it.
       </p>

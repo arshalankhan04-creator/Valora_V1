@@ -21,20 +21,22 @@ describe('WishlistButton', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('shows an empty heart and "Save" label when not wishlisted', () => {
+  it('shows an unfilled heart icon and "Save" label when not wishlisted', () => {
     useAuth.mockReturnValue({ user: { id: 'u1' } })
     useWishlist.mockReturnValue({ wishlistIds: new Set(), toggle: vi.fn() })
 
     render(<WishlistButton listingId="l1" />)
-    expect(screen.getByRole('button', { name: 'Save to wishlist' })).toHaveTextContent('♡')
+    const button = screen.getByRole('button', { name: 'Save to wishlist' })
+    expect(button.querySelector('svg')).toHaveAttribute('fill', 'none')
   })
 
-  it('shows a filled heart and "Remove" label when already wishlisted', () => {
+  it('shows a filled heart icon and "Remove" label when already wishlisted', () => {
     useAuth.mockReturnValue({ user: { id: 'u1' } })
     useWishlist.mockReturnValue({ wishlistIds: new Set(['l1']), toggle: vi.fn() })
 
     render(<WishlistButton listingId="l1" />)
-    expect(screen.getByRole('button', { name: 'Remove from wishlist' })).toHaveTextContent('♥')
+    const button = screen.getByRole('button', { name: 'Remove from wishlist' })
+    expect(button.querySelector('svg')).toHaveAttribute('fill', 'currentColor')
   })
 
   it('calls toggle with the listing id on click', async () => {

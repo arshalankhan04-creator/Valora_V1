@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { getWishlist } from '../services/wishlist'
 import { useWishlist } from '../context/WishlistContext'
 import ListingCard from '../components/ListingCard'
+import { Skeleton } from '../components/ui/skeleton'
+
+const gridVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+}
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0 },
+}
 
 export default function Wishlist() {
   const { wishlistIds } = useWishlist()
@@ -22,20 +33,36 @@ export default function Wishlist() {
   const visibleListings = listings.filter((l) => wishlistIds.has(l._id))
 
   return (
-    <section className="px-6 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-4">My wishlist</h1>
+    <section className="mx-auto max-w-6xl px-6 py-10">
+      <h1 className="text-3xl font-bold text-foreground">My wishlist</h1>
 
-      {loading && <p className="text-gray-500">Loading...</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      {loading && (
+        <div aria-live="polite" className="mt-8">
+          <span className="sr-only">Loading...</span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-xl" />)}
+          </div>
+        </div>
+      )}
+      {error && <p className="mt-8 text-destructive">{error}</p>}
       {!loading && !error && visibleListings.length === 0 && (
-        <p className="text-gray-500">Nothing saved yet — tap the heart on any listing to add it here.</p>
+        <p className="mt-8 text-muted-foreground">Nothing saved yet — tap the heart on any listing to add it here.</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleListings.map((listing) => (
-          <ListingCard key={listing._id} listing={listing} />
-        ))}
-      </div>
+      {!loading && !error && visibleListings.length > 0 && (
+        <motion.div
+          variants={gridVariants}
+          initial="hidden"
+          animate="show"
+          className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {visibleListings.map((listing) => (
+            <motion.div key={listing._id} variants={cardVariants}>
+              <ListingCard listing={listing} />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </section>
   )
 }

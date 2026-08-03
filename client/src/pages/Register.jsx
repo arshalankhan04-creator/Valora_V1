@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -27,49 +30,68 @@ export default function Register() {
   }
 
   return (
-    <section className="max-w-sm mx-auto px-6 py-12">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Sign up</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Full name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-          required
-        />
-        <select
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
-          className="border border-gray-300 rounded px-3 py-2"
-        >
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-        </select>
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button
-          type="submit"
-          className="bg-gray-900 text-white rounded px-3 py-2"
-        >
+    <section className="mx-auto max-w-sm px-6 py-16">
+      <h1 className="text-3xl font-bold text-foreground">Sign up</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Every listing you see gets a fair-price check, a fraud flag, and a trust score.
+      </p>
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="register-name">Full name</Label>
+          <Input
+            id="register-name"
+            type="text"
+            placeholder="Full name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="register-email">Email</Label>
+          <Input
+            id="register-email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="register-password">Password</Label>
+          <Input
+            id="register-password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="register-role">I want to</Label>
+          <select
+            id="register-role"
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            <option value="buyer">Buy a car</option>
+            <option value="seller">Sell a car</option>
+          </select>
+        </div>
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" className="mt-2">
           Sign up
-        </button>
+        </Button>
       </form>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Already have an account?{' '}
+        <Link to="/login" className="font-medium text-primary hover:underline">
+          Log in
+        </Link>
+      </p>
     </section>
   )
 }

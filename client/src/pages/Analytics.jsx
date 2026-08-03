@@ -12,6 +12,8 @@ import {
 import { Bar, Line } from 'react-chartjs-2'
 import { getMarketAnalytics } from '../services/listings'
 import { formatPrice } from '../utils/format'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Skeleton } from '../components/ui/skeleton'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend)
 
@@ -32,10 +34,12 @@ const tooltipForPrice = {
 
 function ChartCard({ title, children }) {
   return (
-    <div className="border border-gray-200 rounded-lg p-4">
-      <h2 className="font-medium text-gray-900 mb-4">{title}</h2>
-      {children}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   )
 }
 
@@ -51,31 +55,40 @@ export default function Analytics() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="px-6 py-12 text-gray-500">Loading...</p>
-  if (error) return <p className="px-6 py-12 text-red-600">{error}</p>
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-5xl px-6 py-8">
+        <span className="sr-only">Loading...</span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
+        </div>
+      </section>
+    )
+  }
+  if (error) return <p className="px-6 py-12 text-destructive">{error}</p>
 
   const noData = Object.values(data).every((group) => group.length === 0)
 
   return (
-    <section className="px-6 py-8 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-1">Market analytics</h1>
-      <p className="text-sm text-gray-500 mb-6">
+    <section className="mx-auto max-w-5xl px-6 py-8">
+      <h1 className="mb-1 text-2xl font-bold text-foreground">Market analytics</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
         Live price trends across every active listing on Valora, not historical training data.
       </p>
 
       {noData && (
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           Not enough active listings yet to show trends — this fills in as the marketplace grows.
         </p>
       )}
 
       {!noData && (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <ChartCard title="Average price by brand">
             <Bar
               data={{
                 labels: data.byBrand.map((d) => d.brand),
-                datasets: [{ label: 'Avg price', data: data.byBrand.map((d) => d.avgPrice), backgroundColor: '#111827' }],
+                datasets: [{ label: 'Avg price', data: data.byBrand.map((d) => d.avgPrice), backgroundColor: 'hsl(142, 76%, 36%)' }],
               }}
               options={tooltipForPrice}
             />
@@ -85,7 +98,7 @@ export default function Analytics() {
             <Bar
               data={{
                 labels: data.byFuelType.map((d) => d.fuelType),
-                datasets: [{ label: 'Avg price', data: data.byFuelType.map((d) => d.avgPrice), backgroundColor: '#111827' }],
+                datasets: [{ label: 'Avg price', data: data.byFuelType.map((d) => d.avgPrice), backgroundColor: 'hsl(142, 76%, 36%)' }],
               }}
               options={tooltipForPrice}
             />
@@ -95,7 +108,7 @@ export default function Analytics() {
             <Line
               data={{
                 labels: data.byYear.map((d) => d.year),
-                datasets: [{ label: 'Avg price', data: data.byYear.map((d) => d.avgPrice), borderColor: '#111827', backgroundColor: '#111827' }],
+                datasets: [{ label: 'Avg price', data: data.byYear.map((d) => d.avgPrice), borderColor: 'hsl(142, 76%, 36%)', backgroundColor: 'hsl(142, 76%, 36%)' }],
               }}
               options={tooltipForPrice}
             />
@@ -105,7 +118,7 @@ export default function Analytics() {
             <Bar
               data={{
                 labels: data.byCondition.map((d) => CONDITION_LABELS[d.bucketStart] ?? d.bucketStart),
-                datasets: [{ label: 'Avg price', data: data.byCondition.map((d) => d.avgPrice), backgroundColor: '#111827' }],
+                datasets: [{ label: 'Avg price', data: data.byCondition.map((d) => d.avgPrice), backgroundColor: 'hsl(142, 76%, 36%)' }],
               }}
               options={tooltipForPrice}
             />
