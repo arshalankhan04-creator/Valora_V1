@@ -1,13 +1,44 @@
-import { useEffect, useState } from 'react'
-import { Send } from 'lucide-react'
-import { getMyInquiries, addMessage } from '../services/inquiries'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { Plus, Search, Send, Archive, ArchiveRestore, MessageSquare, Car, ShieldCheck } from 'lucide-react'
+import { getMyInquiries, addMessage, markInquiryRead, setInquiryArchived } from '../services/inquiries'
 import { useAuth } from '../context/AuthContext'
-import { formatPrice } from '../utils/format'
+import { formatPrice, formatKm } from '../utils/format'
+import { ASSET_BASE_URL } from '../services/api'
+import TrustScoreBadge from '../components/TrustScoreBadge'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { Avatar, AvatarFallback } from '../components/ui/avatar'
 import { Skeleton } from '../components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { cn } from '../lib/utils'
+
+function timeAgo(dateStr) {
+  if (!dateStr) return ''
+  const diffMs = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diffMs / 60000)
+  if (mins < 1) return 'now'
+  if (mins < 60) return `${mins}m`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d`
+  return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+}
+
+function Thumbnail({ src, size = 'size-11' }) {
+  return (
+    <div className={cn(size, 'flex-shrink-0 overflow-hidden rounded-lg bg-muted')}>
+      {src ? (
+        <img src={`${ASSET_BASE_URL}/${src}`} alt="" className="size-full object-cover" />
+      ) : (
+        <div className="flex size-full items-center justify-center text-muted-foreground">
+          <Car className="size-5" />
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function Inquiries() {
   const { user } = useAuth()
@@ -16,17 +47,69 @@ export default function Inquiries() {
   const [loading, setLoading] = useState(true)
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
+  const [tab, setTab] = useState('active')
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     getMyInquiries()
-      .then((data) => {
-        setInquiries(data)
-        if (data.length > 0) setSelectedId(data[0]._id)
-      })
+      .then(setInquiries)
       .finally(() => setLoading(false))
   }, [])
 
+  const otherPartyOf = (inquiry) => (inquiry.buyer?._id === user.id ? inquiry.seller : inquiry.buyer)
+
+  const counts = useMemo(
+    () => ({
+      active: inquiries.filter((i) => !i.archived).length,
+      unread: inquiries.filter((i) => !i.archived && i.unread).length,
+      archived: inquiries.filter((i) => i.archived).length,
+    }),
+    [inquiries],
+  )
+
+  const visible = useMemo(() => {
+    let list = inquiries
+    if (tab === 'active') list = list.filter((i) => !i.archived)
+    else if (tab === 'unread') list = list.filter((i) => !i.archived && i.unread)
+    else list = list.filter((i) => i.archived)
+
+    const q = search.trim().toLowerCase()
+    if (q) {
+      list = list.filter((i) => {
+        const other = otherPartyOf(i)
+        return (
+          i.listing?.brand?.toLowerCase().includes(q) ||
+          i.listing?.model?.toLowerCase().includes(q) ||
+          other?.name?.toLowerCase().includes(q)
+        )
+      })
+    }
+    return list
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inquiries, tab, search])
+
   const selected = inquiries.find((i) => i._id === selectedId)
+
+  const handleSelect = (inquiry) => {
+    setSelectedId(inquiry._id)
+    if (inquiry.unread) {
+      setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, unread: false } : i)))
+      markInquiryRead(inquiry._id).catch(() => {
+        setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, unread: true } : i)))
+      })
+    }
+  }
+
+  const handleToggleArchive = async (inquiry) => {
+    const next = !inquiry.archived
+    setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, archived: next } : i)))
+    try {
+      await setInquiryArchived(inquiry._id, next)
+    } catch {
+      setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, archived: !next } : i)))
+      toast.error(next ? 'Could not archive conversation' : 'Could not unarchive conversation')
+    }
+  }
 
   const handleReply = async (e) => {
     e.preventDefault()
@@ -43,85 +126,208 @@ export default function Inquiries() {
 
   if (loading) {
     return (
-      <section className="mx-auto flex max-w-4xl gap-6 px-6 py-8">
+      <section className="mx-auto flex max-w-5xl gap-6 px-6 py-8">
         <span className="sr-only">Loading...</span>
-        <Skeleton className="h-96 w-56 flex-shrink-0 rounded-lg" />
-        <Skeleton className="h-96 flex-1 rounded-lg" />
+        <Skeleton className="h-[32rem] w-80 flex-shrink-0 rounded-xl" />
+        <Skeleton className="h-[32rem] flex-1 rounded-xl" />
       </section>
     )
   }
+
   if (inquiries.length === 0) {
-    return <p className="px-6 py-12 text-muted-foreground">No inquiries yet.</p>
+    return (
+      <section className="mx-auto max-w-md px-6 py-24 text-center">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-accent">
+          <MessageSquare className="size-6 text-primary" />
+        </div>
+        <h1 className="mt-4 text-lg font-semibold text-foreground">No conversations yet</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Message a seller from any listing to start a conversation here.
+        </p>
+        <Button asChild className="mt-4">
+          <Link to="/listings">Browse listings</Link>
+        </Button>
+      </section>
+    )
   }
 
   return (
-    <section className="mx-auto flex max-w-4xl gap-6 px-6 py-8">
-      <ul className="w-56 flex-shrink-0 divide-y divide-border rounded-lg border border-border bg-card">
-        {inquiries.map((inquiry) => {
-          const otherParty = inquiry.buyer?._id === user.id ? inquiry.seller : inquiry.buyer
-          return (
-            <li key={inquiry._id}>
-              <button
-                onClick={() => setSelectedId(inquiry._id)}
-                className={cn(
-                  'flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
-                  inquiry._id === selectedId ? 'bg-accent' : 'hover:bg-accent/50',
-                )}
-              >
-                <Avatar size="sm">
-                  <AvatarFallback className="bg-primary/10 text-xs text-primary">
-                    {otherParty?.name?.[0]?.toUpperCase() ?? '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-foreground">{inquiry.listing?.brand} {inquiry.listing?.model}</p>
-                  <p className="truncate text-xs text-muted-foreground">with {otherParty?.name}</p>
-                </div>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-
-      {selected && (
-        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card p-4">
-          <div className="mb-3 border-b border-border pb-3">
-            <p className="font-medium text-foreground">
-              {selected.listing?.brand} {selected.listing?.model} · {formatPrice(selected.listing?.price)}
-            </p>
+    <section className="mx-auto max-w-5xl px-6 py-8">
+      <div className="flex h-[36rem] overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex w-80 flex-shrink-0 flex-col border-r border-border">
+          <div className="flex items-center justify-between px-4 pt-4">
+            <h1 className="text-xl font-bold text-foreground">Messages</h1>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/listings"><Plus className="size-4" /> New</Link>
+            </Button>
           </div>
 
-          <div className="mb-4 flex flex-1 flex-col gap-2">
-            {selected.messages.map((msg) => {
-              const fromMe = msg.sender === user.id || msg.sender?._id === user.id
+          <div className="px-4 pt-3">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search conversations..."
+                className="pl-9"
+              />
+            </div>
+          </div>
+
+          <Tabs value={tab} onValueChange={setTab} className="px-4 pt-3">
+            <TabsList className="w-full">
+              <TabsTrigger value="active">Active {counts.active}</TabsTrigger>
+              <TabsTrigger value="unread">Unread {counts.unread}</TabsTrigger>
+              <TabsTrigger value="archived">Archived {counts.archived}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <ul className="mt-3 flex-1 divide-y divide-border overflow-y-auto">
+            {visible.length === 0 && (
+              <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+                {tab === 'archived'
+                  ? 'No archived conversations.'
+                  : tab === 'unread'
+                    ? 'No unread messages.'
+                    : 'No conversations match.'}
+              </li>
+            )}
+            {visible.map((inquiry) => {
+              const other = otherPartyOf(inquiry)
+              const lastMessage = inquiry.messages[inquiry.messages.length - 1]
+              const lastMine = lastMessage?.sender === user.id || lastMessage?.sender?._id === user.id
               return (
-                <div
-                  key={msg._id}
-                  className={cn(
-                    'max-w-xs rounded-lg px-3 py-2 text-sm',
-                    fromMe ? 'self-end bg-primary text-primary-foreground' : 'self-start bg-muted text-foreground',
-                  )}
-                >
-                  {msg.text}
-                </div>
+                <li key={inquiry._id}>
+                  <button
+                    onClick={() => handleSelect(inquiry)}
+                    className={cn(
+                      'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
+                      inquiry._id === selectedId ? 'bg-accent' : 'hover:bg-accent/50',
+                    )}
+                  >
+                    <Thumbnail src={inquiry.listing?.images?.[0]} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={cn('truncate text-sm text-foreground', inquiry.unread && 'font-semibold')}>
+                          {other?.name}
+                        </p>
+                        <span className="flex-shrink-0 text-xs text-muted-foreground">
+                          {timeAgo(lastMessage?.createdAt)}
+                        </span>
+                      </div>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {inquiry.listing?.brand} {inquiry.listing?.model} · {formatPrice(inquiry.listing?.price)}
+                      </p>
+                      <p className={cn('mt-0.5 truncate text-xs', inquiry.unread ? 'font-medium text-foreground' : 'text-muted-foreground')}>
+                        {lastMine ? 'You: ' : ''}{lastMessage?.text}
+                      </p>
+                    </div>
+                    {inquiry.unread && <span className="mt-1.5 size-2 flex-shrink-0 rounded-full bg-primary" />}
+                  </button>
+                </li>
               )
             })}
-          </div>
-
-          <form onSubmit={handleReply} className="flex gap-2">
-            <Input
-              type="text"
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder="Type a reply..."
-              className="flex-1"
-            />
-            <Button type="submit" disabled={sending} size="icon" aria-label="Send">
-              <Send className="size-4" />
-            </Button>
-          </form>
+          </ul>
         </div>
-      )}
+
+        <div className="flex flex-1 flex-col">
+          {!selected ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 py-16 text-center">
+              <div className="flex size-14 items-center justify-center rounded-full bg-accent">
+                <MessageSquare className="size-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Select a conversation</h2>
+                <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+                  Your conversations about car listings will appear here. Each thread stays tied to a
+                  specific listing so nothing gets confused.
+                </p>
+              </div>
+              <div className="mt-2 grid w-full max-w-sm gap-2">
+                <div className="flex items-start gap-3 rounded-lg bg-muted p-3 text-left">
+                  <Car className="mt-0.5 size-4 flex-shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">One thread per listing</p>
+                    <p className="text-xs text-muted-foreground">Two cars from the same seller become two separate chats.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg bg-muted p-3 text-left">
+                  <ShieldCheck className="mt-0.5 size-4 flex-shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Listing context pinned</p>
+                    <p className="text-xs text-muted-foreground">Price, kilometres, and trust signals stay visible while you chat.</p>
+                  </div>
+                </div>
+              </div>
+              <Button asChild className="mt-2">
+                <Link to="/listings">Browse cars to start a chat</Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4 border-b border-border p-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Thumbnail src={selected.listing?.images?.[0]} size="size-10" />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">
+                      {selected.listing?.brand} {selected.listing?.model}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {formatPrice(selected.listing?.price)} · {formatKm(selected.listing?.kmDriven)}
+                    </p>
+                  </div>
+                  {selected.listing?.ml?.trustScore != null && <TrustScoreBadge score={selected.listing.ml.trustScore} />}
+                </div>
+                <div className="flex flex-shrink-0 items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleToggleArchive(selected)}>
+                    {selected.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+                    {selected.archived ? 'Unarchive' : 'Archive'}
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/listings/${selected.listing?._id}`}>View listing</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4">
+                {selected.messages.map((msg) => {
+                  const fromMe = msg.sender === user.id || msg.sender?._id === user.id
+                  return (
+                    <div key={msg._id} className={cn('flex flex-col gap-0.5', fromMe ? 'items-end self-end' : 'items-start self-start')}>
+                      <div
+                        className={cn(
+                          'max-w-xs rounded-2xl px-4 py-2.5 text-sm',
+                          fromMe ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground',
+                        )}
+                      >
+                        {msg.text}
+                      </div>
+                      {msg.createdAt && (
+                        <span className="px-1 text-[11px] text-muted-foreground">
+                          {new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <form onSubmit={handleReply} className="flex gap-2 border-t border-border p-4">
+                <Input
+                  type="text"
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  placeholder="Type a reply..."
+                  className="flex-1 rounded-full"
+                />
+                <Button type="submit" disabled={sending} size="icon" className="flex-shrink-0 rounded-full" aria-label="Send">
+                  <Send className="size-4" />
+                </Button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
     </section>
   )
 }

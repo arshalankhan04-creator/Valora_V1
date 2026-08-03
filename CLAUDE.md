@@ -113,7 +113,7 @@ Listing status is decided by this pipeline, not chosen by the seller:
 
 Compound index: `{ brand: 1, model: 1, year: 1, price: 1 }`.
 
-**Inquiry**: `listing`, `buyer`, `seller` (all ObjectId refs) + `messages: [{ sender, text, timestamps }]`. `findOne({listing, buyer})` reuses an existing thread instead of creating duplicates per message.
+**Inquiry**: `listing`, `buyer`, `seller` (all ObjectId refs) + `messages: [{ sender, text, timestamps }]`. `findOne({listing, buyer})` reuses an existing thread instead of creating duplicates per message. Archive/read state is per-party, not a single shared flag (`buyerArchived`/`sellerArchived`, `buyerLastReadAt`/`sellerLastReadAt`) — an inquiry always has exactly two participants, so one field per side is simpler than a generic participants array. `inquiryController.js`'s `toClientInquiry()` resolves these down to `archived`/`unread` from "whoever is asking"'s perspective and strips the raw per-party fields entirely before the response leaves the server — the other party's read/archive state is never sent to the client. Sending a message (`createInquiry` or `addMessage`) stamps the *sender's own* `*LastReadAt`, not the recipient's.
 
 ## 4. API Contract (Node ↔ Django, under `/api/ml/`)
 
@@ -141,7 +141,15 @@ POST /trust-score/
 
 Client-facing REST (Node, `/api/`): `auth/{register,login,me}`,
 `listings/{,mine,admin,analytics,:id}` (GET/POST/PATCH/DELETE),
-`inquiries/{,:id/messages}`, `users/me/wishlist{,/:listingId}`.
+`inquiries/{,:id/messages,:id/read,:id/archive}`, `users/me/wishlist{,/:listingId}`.
+`GET /inquiries` returns each thread with resolved `archived`/`unread`
+booleans (see §3's Inquiry note) instead of raw per-party fields.
+`PATCH /inquiries/:id/read` marks a thread read for the caller only (204,
+no body — client updates optimistically, same pattern as wishlist add/
+remove). `PATCH /inquiries/:id/archive` takes `{ archived: boolean }` and
+sets the caller's own archive flag (204) — archiving is reversible by
+sending `archived: false`, unlike listing delete, so it doesn't need a
+confirmation dialog.
 `listings/mine`, `listings/admin`, and `listings/analytics` are registered
 **before** `listings/:id` in the router — reordering breaks them (Express
 reads them as the `:id` param otherwise). `GET /listings/analytics`

@@ -160,3 +160,167 @@ describe('POST /api/inquiries/:id/messages', () => {
     expect(res.status).toBe(403)
   })
 })
+
+async function getInquiry(token, inquiryId) {
+  const res = await request(app).get('/api/inquiries').set('Authorization', `Bearer ${token}`)
+  return res.body.inquiries.find((i) => i._id === inquiryId)
+}
+
+describe('GET /api/inquiries — archived/unread derivation', () => {
+  it('is unread for the seller and read for the buyer right after the opening message', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+    const inquiryId = created.body.inquiry._id
+
+    const forBuyer = await getInquiry(buyer.token, inquiryId)
+    const forSeller = await getInquiry(seller.token, inquiryId)
+
+    expect(forBuyer.unread).toBe(false)
+    expect(forSeller.unread).toBe(true)
+    expect(forBuyer.archived).toBe(false)
+    expect(forSeller.archived).toBe(false)
+    // Neither party's raw per-side fields should ever reach the client.
+    expect(forBuyer.buyerLastReadAt).toBeUndefined()
+    expect(forBuyer.sellerArchived).toBeUndefined()
+  })
+
+  it('flips unread once a reply is sent, and back for the replier', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+    const inquiryId = created.body.inquiry._id
+
+    await request(app)
+      .post(`/api/inquiries/${inquiryId}/messages`)
+      .set('Authorization', `Bearer ${seller.token}`)
+      .send({ text: 'Yes, available' })
+
+    expect((await getInquiry(seller.token, inquiryId)).unread).toBe(false)
+    expect((await getInquiry(buyer.token, inquiryId)).unread).toBe(true)
+  })
+})
+
+describe('PATCH /api/inquiries/:id/read', () => {
+  it('marks the thread read for the caller only', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+    const inquiryId = created.body.inquiry._id
+
+    const res = await request(app)
+      .patch(`/api/inquiries/${inquiryId}/read`)
+      .set('Authorization', `Bearer ${seller.token}`)
+
+    expect(res.status).toBe(204)
+    expect((await getInquiry(seller.token, inquiryId)).unread).toBe(false)
+  })
+
+  it('rejects a caller who is not part of the conversation', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const stranger = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+
+    const res = await request(app)
+      .patch(`/api/inquiries/${created.body.inquiry._id}/read`)
+      .set('Authorization', `Bearer ${stranger.token}`)
+
+    expect(res.status).toBe(403)
+  })
+})
+
+describe('PATCH /api/inquiries/:id/archive', () => {
+  it('archives the thread for the caller without affecting the other party', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+    const inquiryId = created.body.inquiry._id
+
+    const res = await request(app)
+      .patch(`/api/inquiries/${inquiryId}/archive`)
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ archived: true })
+
+    expect(res.status).toBe(204)
+    expect((await getInquiry(buyer.token, inquiryId)).archived).toBe(true)
+    expect((await getInquiry(seller.token, inquiryId)).archived).toBe(false)
+  })
+
+  it('can be reversed by sending archived: false', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+    const inquiryId = created.body.inquiry._id
+    await request(app)
+      .patch(`/api/inquiries/${inquiryId}/archive`)
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ archived: true })
+
+    await request(app)
+      .patch(`/api/inquiries/${inquiryId}/archive`)
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ archived: false })
+
+    expect((await getInquiry(buyer.token, inquiryId)).archived).toBe(false)
+  })
+
+  it('rejects a non-boolean archived value', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+
+    const res = await request(app)
+      .patch(`/api/inquiries/${created.body.inquiry._id}/archive`)
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ archived: 'yes' })
+
+    expect(res.status).toBe(400)
+  })
+
+  it('rejects a caller who is not part of the conversation', async () => {
+    const seller = await registerUser('seller')
+    const buyer = await registerUser('buyer')
+    const stranger = await registerUser('buyer')
+    const listingId = await createListing(seller.token)
+    const created = await request(app)
+      .post('/api/inquiries')
+      .set('Authorization', `Bearer ${buyer.token}`)
+      .send({ listingId, text: 'Opening message' })
+
+    const res = await request(app)
+      .patch(`/api/inquiries/${created.body.inquiry._id}/archive`)
+      .set('Authorization', `Bearer ${stranger.token}`)
+      .send({ archived: true })
+
+    expect(res.status).toBe(403)
+  })
+})

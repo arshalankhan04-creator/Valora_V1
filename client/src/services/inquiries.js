@@ -11,3 +11,11 @@ export function createInquiry(listingId, text) {
 export function addMessage(inquiryId, text) {
   return api.post(`/inquiries/${inquiryId}/messages`, { text }).then((res) => res.data.inquiry)
 }
+
+export function markInquiryRead(inquiryId) {
+  return api.patch(`/inquiries/${inquiryId}/read`)
+}
+
+export function setInquiryArchived(inquiryId, archived) {
+  return api.patch(`/inquiries/${inquiryId}/archive`, { archived })
+}
