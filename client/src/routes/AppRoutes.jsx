@@ -57,6 +57,14 @@ export default function AppRoutes() {
           }
         />
         <Route
+          path="/inquiries/:id"
+          element={
+            <ProtectedRoute>
+              <Inquiries />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/wishlist"
           element={
             <ProtectedRoute>

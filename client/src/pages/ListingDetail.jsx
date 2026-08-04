@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { animate } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 import { getListing } from '../services/listings'
 import { createInquiry } from '../services/inquiries'
 import { useAuth } from '../context/AuthContext'
@@ -9,6 +10,7 @@ import { formatPrice, formatKm } from '../utils/format'
 import TrustScoreBadge from '../components/TrustScoreBadge'
 import RiskFlagBadge from '../components/RiskFlagBadge'
 import WishlistButton from '../components/WishlistButton'
+import BackButton from '../components/BackButton'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
@@ -75,6 +77,7 @@ export default function ListingDetail() {
   if (loading) {
     return (
       <section className="mx-auto max-w-4xl px-6 py-8">
+        <BackButton fallback="/listings" className="mb-4" />
         <span className="sr-only">Loading...</span>
         <Skeleton className="mb-6 aspect-video w-full rounded-lg" />
         <Skeleton className="h-8 w-2/3" />
@@ -82,7 +85,14 @@ export default function ListingDetail() {
       </section>
     )
   }
-  if (error || !listing) return <p className="px-6 py-12 text-destructive">{error || 'Not found'}</p>
+  if (error || !listing) {
+    return (
+      <section className="mx-auto max-w-4xl px-6 py-12">
+        <BackButton fallback="/listings" className="mb-4" />
+        <p className="text-destructive">{error || 'Not found'}</p>
+      </section>
+    )
+  }
 
   const ml = listing.ml || {}
   const isOwnListing = user?.id === listing.seller?._id
@@ -90,6 +100,15 @@ export default function ListingDetail() {
 
   return (
     <section className="mx-auto max-w-4xl px-6 py-8">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <BackButton fallback="/listings" />
+        <nav aria-label="Breadcrumb" className="hidden items-center gap-1.5 text-sm text-muted-foreground sm:flex">
+          <Link to="/listings" className="hover:text-foreground hover:underline">Listings</Link>
+          <ChevronRight className="size-3.5 flex-shrink-0" />
+          <span className="max-w-[220px] truncate text-foreground">{listing.brand} {listing.model}</span>
+        </nav>
+      </div>
+
       {listing.images?.length > 0 ? (
         <div className="mb-6 grid grid-cols-3 gap-2">
           {listing.images.map((img) => (

@@ -41,13 +41,14 @@ const LISTING = {
   },
 }
 
-function renderDetail(user) {
+function renderDetail(user, { initialEntries = ['/listings/l1'], initialIndex } = {}) {
   if (user) localStorage.setItem('user', JSON.stringify(user))
   return render(
-    <MemoryRouter initialEntries={['/listings/l1']}>
+    <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
       <AuthProvider>
         <WishlistProvider>
           <Routes>
+            <Route path="/listings" element={<p>Listings page</p>} />
             <Route path="/listings/:id" element={<ListingDetail />} />
           </Routes>
         </WishlistProvider>
@@ -145,5 +146,45 @@ describe('ListingDetail', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Contact seller' }))
 
     expect(await screen.findByText('Could not send message')).toBeInTheDocument()
+  })
+
+  describe('back navigation', () => {
+    it('shows a breadcrumb linking back to Listings', async () => {
+      listingsService.getListing.mockResolvedValue(LISTING)
+      renderDetail()
+      await screen.findByText('Honda City · 2021')
+
+      const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' })
+      expect(breadcrumb).toHaveTextContent('Listings')
+      expect(breadcrumb).toHaveTextContent('Honda City')
+    })
+
+    it('falls back to Listings when opened directly (no in-app history)', async () => {
+      listingsService.getListing.mockResolvedValue(LISTING)
+      renderDetail()
+      await screen.findByText('Honda City · 2021')
+
+      await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+
+      expect(await screen.findByText('Listings page')).toBeInTheDocument()
+    })
+
+    it('returns to the actual previous page when reached via in-app navigation', async () => {
+      listingsService.getListing.mockResolvedValue(LISTING)
+      renderDetail(null, { initialEntries: ['/listings', '/listings/l1'], initialIndex: 1 })
+      await screen.findByText('Honda City · 2021')
+
+      await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+
+      expect(await screen.findByText('Listings page')).toBeInTheDocument()
+    })
+
+    it('shows the back button on the not-found error state too', async () => {
+      listingsService.getListing.mockRejectedValue(new Error('404'))
+      renderDetail()
+
+      expect(await screen.findByText('Listing not found')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+    })
   })
 })

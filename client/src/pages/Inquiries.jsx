@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Plus, Search, Send, Archive, ArchiveRestore, MessageSquare, Car, ShieldCheck } from 'lucide-react'
 import { getMyInquiries, addMessage, markInquiryRead, setInquiryArchived } from '../services/inquiries'
@@ -42,8 +42,8 @@ function Thumbnail({ src, size = 'size-11' }) {
 
 export default function Inquiries() {
   const { user } = useAuth()
+  const { id: selectedId } = useParams()
   const [inquiries, setInquiries] = useState([])
-  const [selectedId, setSelectedId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
@@ -90,15 +90,18 @@ export default function Inquiries() {
 
   const selected = inquiries.find((i) => i._id === selectedId)
 
-  const handleSelect = (inquiry) => {
-    setSelectedId(inquiry._id)
-    if (inquiry.unread) {
-      setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, unread: false } : i)))
-      markInquiryRead(inquiry._id).catch(() => {
-        setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, unread: true } : i)))
-      })
-    }
-  }
+  // Marking read is keyed off the *resolved* selection rather than the click
+  // handler alone, so it also fires when a conversation is opened via direct
+  // URL, a bookmark, or browser back/forward — not just a row click.
+  useEffect(() => {
+    if (!selected || !selected.unread) return
+    const id = selected._id
+    setInquiries((prev) => prev.map((i) => (i._id === id ? { ...i, unread: false } : i)))
+    markInquiryRead(id).catch(() => {
+      setInquiries((prev) => prev.map((i) => (i._id === id ? { ...i, unread: true } : i)))
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?._id])
 
   const handleToggleArchive = async (inquiry) => {
     const next = !inquiry.archived
@@ -198,8 +201,8 @@ export default function Inquiries() {
               const lastMine = lastMessage?.sender === user.id || lastMessage?.sender?._id === user.id
               return (
                 <li key={inquiry._id}>
-                  <button
-                    onClick={() => handleSelect(inquiry)}
+                  <Link
+                    to={`/inquiries/${inquiry._id}`}
                     className={cn(
                       'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
                       inquiry._id === selectedId ? 'bg-accent' : 'hover:bg-accent/50',
@@ -223,7 +226,7 @@ export default function Inquiries() {
                       </p>
                     </div>
                     {inquiry.unread && <span className="mt-1.5 size-2 flex-shrink-0 rounded-full bg-primary" />}
-                  </button>
+                  </Link>
                 </li>
               )
             })}

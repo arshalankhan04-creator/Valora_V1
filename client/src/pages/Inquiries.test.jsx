@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '../context/AuthContext'
 import * as inquiriesService from '../services/inquiries'
 import Inquiries from './Inquiries'
@@ -29,12 +29,15 @@ function makeInquiry(overrides = {}) {
   }
 }
 
-function renderInquiries(user = BUYER) {
+function renderInquiries(user = BUYER, initialPath = '/inquiries') {
   localStorage.setItem('user', JSON.stringify(user))
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[initialPath]}>
       <AuthProvider>
-        <Inquiries />
+        <Routes>
+          <Route path="/inquiries" element={<Inquiries />} />
+          <Route path="/inquiries/:id" element={<Inquiries />} />
+        </Routes>
       </AuthProvider>
       <Toaster />
     </MemoryRouter>,

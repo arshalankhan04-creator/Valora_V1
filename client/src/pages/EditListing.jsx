@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getListing, updateListing } from '../services/listings'
 import { useAuth } from '../context/AuthContext'
 import ListingForm from '../components/ListingForm'
+import BackButton from '../components/BackButton'
 
 export default function EditListing() {
   const { id } = useParams()
@@ -22,13 +23,32 @@ export default function EditListing() {
       .finally(() => setLoading(false))
   }, [id])
 
-  if (loading) return <p className="px-6 py-12 text-muted-foreground">Loading...</p>
-  if (loadError) return <p className="px-6 py-12 text-destructive">{loadError}</p>
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-lg px-6 py-8">
+        <BackButton fallback="/my-listings" className="mb-4" />
+        <p className="text-muted-foreground">Loading...</p>
+      </section>
+    )
+  }
+  if (loadError) {
+    return (
+      <section className="mx-auto max-w-lg px-6 py-8">
+        <BackButton fallback="/my-listings" className="mb-4" />
+        <p className="text-destructive">{loadError}</p>
+      </section>
+    )
+  }
 
   const sellerId = listing.seller?._id || listing.seller
   const isOwner = sellerId === user.id
   if (!isOwner && user.role !== 'admin') {
-    return <p className="px-6 py-12 text-destructive">This isn't your listing to edit.</p>
+    return (
+      <section className="mx-auto max-w-lg px-6 py-8">
+        <BackButton fallback="/my-listings" className="mb-4" />
+        <p className="text-destructive">This isn't your listing to edit.</p>
+      </section>
+    )
   }
 
   const initialValues = {
@@ -57,6 +77,7 @@ export default function EditListing() {
 
   return (
     <section className="mx-auto max-w-lg px-6 py-8">
+      <BackButton fallback="/my-listings" className="mb-4" />
       <h1 className="mb-2 text-2xl font-bold text-foreground">Edit listing</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         Changing details here won't re-run the price, fraud, or condition analysis — if this
