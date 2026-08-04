@@ -14,7 +14,12 @@ app.use(helmet())
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
 app.use(express.json())
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'))
-app.use('/uploads', express.static('uploads'))
+// Helmet's default Cross-Origin-Resource-Policy (same-origin) blocks the
+// Vite client (a different origin) from loading these images — scoped to
+// just this route rather than relaxed app-wide.
+app.use('/uploads', express.static('uploads', {
+  setHeaders: (res) => res.set('Cross-Origin-Resource-Policy', 'cross-origin'),
+}))
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 app.use('/api/auth', authRoutes)
