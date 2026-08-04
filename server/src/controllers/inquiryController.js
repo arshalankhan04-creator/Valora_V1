@@ -71,6 +71,7 @@ export const getMyInquiries = asyncHandler(async (req, res) => {
 export const addMessage = asyncHandler(async (req, res) => {
   const { text } = req.body
   const inquiry = await Inquiry.findById(req.params.id)
+    .populate('listing', 'brand model price images kmDriven ml')
     .populate('buyer', 'email name')
     .populate('seller', 'email name')
   if (!inquiry) throw new ApiError(404, 'Inquiry not found')

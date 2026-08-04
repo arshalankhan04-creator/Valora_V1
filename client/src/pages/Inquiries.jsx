@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Plus, Search, Send, Archive, ArchiveRestore, MessageSquare, Car, ShieldCheck } from 'lucide-react'
@@ -103,6 +103,14 @@ export default function Inquiries() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected?._id])
 
+  const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    if (selected) {
+      messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' })
+    }
+  }, [selectedId, selected?.messages?.length])
+
   const handleToggleArchive = async (inquiry) => {
     const next = !inquiry.archived
     setInquiries((prev) => prev.map((i) => (i._id === inquiry._id ? { ...i, archived: next } : i)))
@@ -120,7 +128,16 @@ export default function Inquiries() {
     setSending(true)
     try {
       const updated = await addMessage(selectedId, reply)
-      setInquiries((prev) => prev.map((i) => (i._id === selectedId ? updated : i)))
+      setInquiries((prev) =>
+        prev.map((i) => {
+          if (i._id !== selectedId) return i
+          const listing =
+            typeof updated.listing === 'object' && updated.listing?.brand
+              ? updated.listing
+              : i.listing
+          return { ...updated, listing }
+        }),
+      )
       setReply('')
     } finally {
       setSending(false)
@@ -313,6 +330,7 @@ export default function Inquiries() {
                     </div>
                   )
                 })}
+                <div ref={messagesEndRef} />
               </div>
 
               <form onSubmit={handleReply} className="flex gap-2 border-t border-border p-4">
