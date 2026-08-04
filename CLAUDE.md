@@ -1,8 +1,12 @@
 # Valora — Project Reference
 
-Generated from the actual implemented state as of 2026-08-02. This is a
-factual reference for THIS codebase — not general working preferences (those
-live in the standing instructions already governing this project).
+Generated from the actual implemented state as of 2026-08-02, last updated
+2026-08-04. This is a factual reference for THIS codebase — not general
+working preferences (those live in the standing instructions already
+governing this project). For a fuller onboarding narrative (why things are
+built this way, pending tasks, known issues), see
+[`PROJECT_HANDOFF.md`](PROJECT_HANDOFF.md) — this file stays terse and
+load-bearing; that one has the full story.
 
 ## 1. Project Scope
 
@@ -17,11 +21,16 @@ live in the standing instructions already governing this project).
   (MongoDB aggregation + Chart.js — see §6).
 - 4 ML layers, all live and wired: price prediction (regression), fraud
   detection (classification), CNN condition assessment, combined Trust Score.
-- Automated tests: server (Vitest+Supertest, 46 tests), client (Vitest+RTL,
-  94 tests — all pages covered, each with its own service mock), ml-service
+- Buyer-first guest landing page (shown only when logged out — see §8) plus
+  a role-aware logged-in home page. Comprehensive, formula-consistent seed
+  data for exercising every UI state (see §9).
+- Automated tests: server (Vitest+Supertest, 54 tests), client (Vitest+RTL,
+  122 tests — all pages covered, each with its own service mock), ml-service
   (Django test runner, 34 tests — includes
   view-level auth/validation/success/model-not-trained coverage for all
   four ML endpoints, model inference mocked via `unittest.mock.patch.object`).
+  210 tests total, all passing as of 2026-08-04. Server tests must run with
+  `--no-file-parallelism` (see §7) since they share one real MongoDB test DB.
 - Light security hardening: helmet, rate-limiting on auth routes, NoSQL
   injection type-guards on every value that reaches a Mongoose query filter.
 - Deployment prep exists (render.yaml, vercel.json, production Django config)
@@ -113,7 +122,7 @@ Listing status is decided by this pipeline, not chosen by the seller:
 
 Compound index: `{ brand: 1, model: 1, year: 1, price: 1 }`.
 
-**Inquiry**: `listing`, `buyer`, `seller` (all ObjectId refs) + `messages: [{ sender, text, timestamps }]`. `findOne({listing, buyer})` reuses an existing thread instead of creating duplicates per message. Archive/read state is per-party, not a single shared flag (`buyerArchived`/`sellerArchived`, `buyerLastReadAt`/`sellerLastReadAt`) — an inquiry always has exactly two participants, so one field per side is simpler than a generic participants array. `inquiryController.js`'s `toClientInquiry()` resolves these down to `archived`/`unread` from "whoever is asking"'s perspective and strips the raw per-party fields entirely before the response leaves the server — the other party's read/archive state is never sent to the client. Sending a message (`createInquiry` or `addMessage`) stamps the *sender's own* `*LastReadAt`, not the recipient's.
+**Inquiry**: `listing`, `buyer`, `seller` (all ObjectId refs) + `messages: [{ sender, text, timestamps }]`. `findOne({listing, buyer})` reuses an existing thread instead of creating duplicates per message. Archive/read state is per-party, not a single shared flag (`buyerArchived`/`sellerArchived`, `buyerLastReadAt`/`sellerLastReadAt`) — an inquiry always has exactly two participants, so one field per side is simpler than a generic participants array. `inquiryController.js`'s `toClientInquiry()` resolves these down to `archived`/`unread` from "whoever is asking"'s perspective and strips the raw per-party fields entirely before the response leaves the server — the other party's read/archive state is never sent to the client. Sending a message (`createInquiry` or `addMessage`) stamps the *sender's own* `*LastReadAt`, not the recipient's. `unread` only depends on the **last** message in the thread (not full history): true iff the last message wasn't from the caller and (no `*LastReadAt` yet, or that timestamp predates the last message). `Inquiries.jsx` shows a light/dark-aware chat wallpaper behind the message list (`.chat-wallpaper` rules in `client/src/index.css`, images in `client/src/assets/chat-bg-{light,dark}.webp`) — the dark variant is wired but dormant until the app gets a dark-mode toggle.
 
 ## 4. API Contract (Node ↔ Django, under `/api/ml/`)
 
@@ -157,6 +166,13 @@ reads them as the `:id` param otherwise). `GET /listings/analytics`
 each an array of `{ <dimension>, avgPrice, count }` aggregated over
 `status: 'active'` listings only — flagged/sold/pending listings never
 skew the averages.
+
+`Listings.jsx` (client) seeds its filter state from `useSearchParams()` on
+mount — `?brand=`, `?fuelType=`, `?minPrice=`, `?maxPrice=` — so the landing
+page's hero search box and category tiles can deep-link straight into a
+pre-filtered listings view (§8) without any server-side change; these are
+just the existing `GET /listings` query filters read from the URL instead
+of only from in-page filter controls.
 
 ## 5. Trust Score Formula (`trust_score/scoring.py`)
 
@@ -215,3 +231,58 @@ noted in `price_prediction/prepare_data.py`.
 - **Don't build a Dash app for analytics** — the live seller dashboard is Node aggregation + React/Chart.js on purpose (§6's own reasoning); Seaborn's syllabus mention is `price_prediction/eda.py` instead, a separate report artifact.
 - **Don't run server tests with `fileParallelism: true`** — they share one real MongoDB test database (`valora_v1_test`); parallel files race on the `afterEach` cleanup (reproduced this exact failure once).
 - **Don't point `server/.env.test`'s `MONGODB_URI` at a non-`_test` database** — `tests/setup.js` throws on purpose rather than risk wiping dev/seed data.
+- **Don't relax `Cross-Origin-Resource-Policy` app-wide to fix image loading** — helmet's default `same-origin` policy blocks the Vite client (different origin) from loading `/uploads` images; the fix is a route-scoped `cross-origin` override on just that static route (`app.js`), not disabling/loosening helmet globally.
+- **Don't hand-pick `ml.trustScore`/`riskFlag`/`trustBreakdown` values in `seed.js`** — it re-implements the real scoring/fraud-threshold formulas locally (`priceFairnessFromRange`, `riskFlagFor`, `computeTrust`, etc.) so seeded data matches what the production pipeline would actually compute. If `trust_score/scoring.py` or `fraud_detection/inference.py`'s thresholds ever change, update the mirrored copies in `seed.js` too.
+
+## 8. Landing Page Architecture
+
+Guest-only (`Home.jsx`: `if (!user) return <LandingPage />`), buyer-first
+by deliberate decision. Section components live in
+`client/src/components/landing/`, rendered in order by `LandingPage.jsx`:
+`LandingHero` (search → `/listings?brand=`) → `FeaturedListings` (real
+first-3 listings, renders nothing if zero) → `WhyValora` (static AI-feature
+cards) → `TrustScoreShowcase` (real highest-`trustScore` listing via
+`AnimatedTrustScore`/`TrustBreakdownRow` — same components
+`ListingDetail.jsx` uses; falls back to a hardcoded example explicitly
+labeled "Example" only if nothing is scored yet) → `BrowseByCategory`
+(static tiles → `/listings?fuelType=`/`?maxPrice=`) → `HowItWorks` →
+`SellerCta` (→ `/register`, not `/sell`) → `Faq` (shadcn `ui/accordion.jsx`)
+→ `FinalCta` → `LandingFooter` (oversized wordmark as the dominant visual
+element, plus a real nav row: Browse listings, Sell a car, Log in, Sign up
+— no GitHub/fake support/social links, since this footer only ever renders
+logged-out).
+
+`AnimatedTrustScore.jsx` and `TrustBreakdownRow.jsx` were extracted out of
+`ListingDetail.jsx` specifically so the showcase renders real trust-score
+data with the exact same visual treatment as the detail page — reuse them
+for any future trust-score UI rather than duplicating.
+
+Known test-environment caveat: `AnimatedTrustScore` counts up via
+`requestAnimationFrame`; in a non-frame-compositing headless browser
+context it can render stuck at `0` even though the underlying
+`ml.trustScore` is correct — verify via the API response body if this
+comes up, not just the rendered number.
+
+## 9. Seed Data
+
+`server/src/scripts/seed.js`, run via `npm run seed` from `server/`
+(`MONGODB_URI` must point at a real, non-test DB — it deletes and replaces
+all Users/Listings/Inquiries every run). Creates 10 users (1 admin, 5
+sellers with varied history/age — one with zero listings, one brand-new/
+no-history feeding a deliberately flagged listing — 4 buyers, all password
+`password123`), 20 listings (9 brands, all 6 fuel types, both
+transmissions, all 4 price tiers, all 3 trust tiers, 0/1/multi images,
+empty/complete descriptions, ages 12h–90d — every dimension has ≥2-3
+records; 4 land `status: 'flagged'`), and 10 inquiries (every unread/read/
+archived combination, tracked independently per buyer and seller per §3's
+model note, single- and multi-message, varied timestamps).
+
+`ml.*` fields are computed by helper functions in the script that mirror
+the real `trust_score/scoring.py` and `fraud_detection/inference.py`
+formulas exactly (see §7's DO NOT) — never arbitrary numbers. Images come
+from a git-tracked placeholder folder, `server/src/scripts/seed-assets/`
+(5 small synthetic JPGs, clearly labeled as placeholders), copied into the
+gitignored `uploads/listings/` at seed time so the script is
+self-contained from a fresh clone. Seeding bypasses `POST /api/listings`
+(direct `Listing.create()`), so these images never go through the real
+condition-assessment CNN.
