@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ShieldCheck, Gauge, Camera } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/button'
+import LandingPage from '../components/landing/LandingPage'
 
 const BUYER_FEATURES = [
   { icon: Gauge, title: 'Fair-price check', body: 'A predicted price range for every listing, not a single guess.' },
@@ -18,18 +19,21 @@ const SELLER_FEATURES = [
 
 export default function Home() {
   const { user } = useAuth()
-  const isSeller = user?.role === 'seller' || user?.role === 'admin'
+
+  // Logged-out visitors get the full marketing landing page. Logged-in
+  // buyers/sellers get a short, functional welcome-back page instead — they
+  // don't need re-convincing of the value prop, they need a fast path to
+  // what they'd actually do next.
+  if (!user) return <LandingPage />
+
+  const isSeller = user.role === 'seller' || user.role === 'admin'
 
   const title = isSeller ? 'List your car with trust built in' : 'Find a used car you can actually trust'
   const subtitle = isSeller
     ? 'Every listing you post gets an automatic fair-price check, fraud risk flag, and condition score — the same signals buyers use to decide who to trust.'
     : 'Every listing gets a fair-price check, a fraud risk flag, and a condition score before you ever message the seller.'
   const primaryCta = isSeller ? { to: '/sell', label: 'List a car' } : { to: '/listings', label: 'Browse listings' }
-  const secondaryCta = isSeller
-    ? { to: '/my-listings', label: 'My listings' }
-    : user
-      ? { to: '/wishlist', label: 'My wishlist' }
-      : { to: '/register', label: 'Sign up free' }
+  const secondaryCta = isSeller ? { to: '/my-listings', label: 'My listings' } : { to: '/wishlist', label: 'My wishlist' }
   const features = isSeller ? SELLER_FEATURES : BUYER_FEATURES
 
   return (

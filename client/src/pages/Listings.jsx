@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getListings } from '../services/listings'
 import ListingCard from '../components/ListingCard'
@@ -19,18 +20,23 @@ const cardVariants = {
 }
 
 export default function Listings() {
-  const [filters, setFilters] = useState({
-    brand: '',
-    model: '',
-    fuelType: '',
-    minPrice: '',
-    maxPrice: '',
+  // Seeded once from the URL on mount — lets the landing page's hero search
+  // and category tiles deep-link straight into a pre-filtered result (e.g.
+  // /listings?fuelType=Electric), without making the filter UI itself
+  // bidirectionally URL-synced, which is a bigger feature than this needs.
+  const [searchParams] = useSearchParams()
+  const [filters, setFilters] = useState(() => ({
+    brand: searchParams.get('brand') || '',
+    model: searchParams.get('model') || '',
+    fuelType: searchParams.get('fuelType') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
     minYear: '',
     maxYear: '',
     minKm: '',
     maxKm: '',
     minTrustScore: '',
-  })
+  }))
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

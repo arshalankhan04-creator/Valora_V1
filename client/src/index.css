@@ -192,3 +192,20 @@
     @apply tracking-brand;
   }
 }
+
+@layer components {
+  /* Inquiries message-thread wallpaper. --chat-bg-light/--chat-bg-dark are
+     set inline per-instance (Vite-hashed asset URLs can't be referenced from
+     plain CSS). The .dark rule is wired now but inert until dark mode is
+     actually toggled somewhere — no toggle exists yet (DESIGN_SYSTEM_DECISIONS.md
+     §7), so only the light wallpaper is visible today. */
+  .chat-wallpaper {
+    background-image: var(--chat-bg-light);
+    background-repeat: repeat;
+    background-size: 320px auto;
+  }
+
+  .dark .chat-wallpaper {
+    background-image: var(--chat-bg-dark);
+  }
+}

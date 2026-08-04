@@ -21,9 +21,9 @@ const HONDA = {
   ml: { trustScore: 88, riskFlag: 'Low' },
 }
 
-function renderListings() {
+function renderListings(initialEntries = ['/listings']) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <AuthProvider>
         <WishlistProvider>
           <Listings />
@@ -72,5 +72,26 @@ describe('Listings', () => {
     await waitFor(() => expect(listingsService.getListings).toHaveBeenLastCalledWith(
       expect.objectContaining({ brand: 'Honda' }),
     ))
+  })
+
+  describe('deep-linking from the URL', () => {
+    it('seeds the brand filter from a ?brand= query param', async () => {
+      listingsService.getListings.mockResolvedValue([])
+      renderListings(['/listings?brand=Honda'])
+
+      await waitFor(() => expect(listingsService.getListings).toHaveBeenCalledWith(
+        expect.objectContaining({ brand: 'Honda' }),
+      ))
+      expect(screen.getByPlaceholderText('Brand')).toHaveValue('Honda')
+    })
+
+    it('seeds fuel type and price range from query params (category tiles)', async () => {
+      listingsService.getListings.mockResolvedValue([])
+      renderListings(['/listings?fuelType=Electric&minPrice=500000&maxPrice=1000000'])
+
+      await waitFor(() => expect(listingsService.getListings).toHaveBeenCalledWith(
+        expect.objectContaining({ fuelType: 'Electric', minPrice: '500000', maxPrice: '1000000' }),
+      ))
+    })
   })
 })

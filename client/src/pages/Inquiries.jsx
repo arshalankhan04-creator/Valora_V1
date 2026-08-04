@@ -12,6 +12,8 @@ import { Input } from '../components/ui/input'
 import { Skeleton } from '../components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { cn } from '../lib/utils'
+import chatBgLight from '../assets/chat-bg-light.webp'
+import chatBgDark from '../assets/chat-bg-dark.webp'
 
 function timeAgo(dateStr) {
   if (!dateStr) return ''
@@ -109,6 +111,7 @@ export default function Inquiries() {
     if (selected) {
       messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, selected?.messages?.length])
 
   const handleToggleArchive = async (inquiry) => {
@@ -309,7 +312,10 @@ export default function Inquiries() {
                 </div>
               </div>
 
-              <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4">
+              <div
+                className="chat-wallpaper flex flex-1 flex-col gap-2 overflow-y-auto p-4"
+                style={{ '--chat-bg-light': `url(${chatBgLight})`, '--chat-bg-dark': `url(${chatBgDark})` }}
+              >
                 {selected.messages.map((msg) => {
                   const fromMe = msg.sender === user.id || msg.sender?._id === user.id
                   return (

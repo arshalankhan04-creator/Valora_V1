@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { animate } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { getListing } from '../services/listings'
 import { createInquiry } from '../services/inquiries'
@@ -11,36 +10,12 @@ import TrustScoreBadge from '../components/TrustScoreBadge'
 import RiskFlagBadge from '../components/RiskFlagBadge'
 import WishlistButton from '../components/WishlistButton'
 import BackButton from '../components/BackButton'
+import AnimatedTrustScore from '../components/AnimatedTrustScore'
+import TrustBreakdownRow from '../components/TrustBreakdownRow'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
 import { Skeleton } from '../components/ui/skeleton'
-
-function AnimatedTrustScore({ value }) {
-  const [display, setDisplay] = useState(0)
-
-  useEffect(() => {
-    const controls = animate(0, value, {
-      duration: 1,
-      ease: 'easeOut',
-      onUpdate: (v) => setDisplay(Math.round(v)),
-    })
-    return () => controls.stop()
-  }, [value])
-
-  return <span>{display}</span>
-}
-
-function BreakdownRow({ label, value, max }) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">
-        {value?.toFixed(1) ?? '—'} <span className="text-muted-foreground">/ {max}</span>
-      </span>
-    </div>
-  )
-}
 
 export default function ListingDetail() {
   const { id } = useParams()
@@ -158,10 +133,10 @@ export default function ListingDetail() {
                 <span className="text-2xl text-muted-foreground">/100</span>
               </div>
               <div className="flex-1 space-y-1.5">
-                <BreakdownRow label="Price fairness" value={ml.trustBreakdown?.priceFairness} max={40} />
-                <BreakdownRow label="Fraud risk" value={ml.trustBreakdown?.fraudRisk} max={30} />
-                <BreakdownRow label="Condition match" value={ml.trustBreakdown?.conditionMatch} max={30} />
-                <BreakdownRow label="Seller factor" value={ml.trustBreakdown?.sellerFactor} max={5} />
+                <TrustBreakdownRow label="Price fairness" value={ml.trustBreakdown?.priceFairness} max={40} />
+                <TrustBreakdownRow label="Fraud risk" value={ml.trustBreakdown?.fraudRisk} max={30} />
+                <TrustBreakdownRow label="Condition match" value={ml.trustBreakdown?.conditionMatch} max={30} />
+                <TrustBreakdownRow label="Seller factor" value={ml.trustBreakdown?.sellerFactor} max={5} />
               </div>
             </CardContent>
           </Card>
