@@ -3,9 +3,66 @@ import ApiError from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js'
 import escapeRegex from '../utils/escapeRegex.js'
 import { scoreListing } from '../services/listingIntelligence.js'
+import { validateVehicle, verifyListing } from '../services/mlService.js'
 
 export const createListing = asyncHandler(async (req, res) => {
   const { brand, model, year, kmDriven, fuelType, transmission, price, description } = req.body
+
+  const images = (req.files || []).map((file) => file.path.replace(/\\/g, '/'))
+  if (images.length === 0) throw new ApiError(400, 'At least one photo is required')
+
+  // Step 2 — vehicle check (YOLOv8, local, no API cost).
+  // If the ML service is down we skip the check rather than blocking the listing.
+  try {
+    const check = await validateVehicle(images)
+    if (!check.valid) {
+      throw new ApiError(400, check.reason ?? 'Photos must show the vehicle being listed.')
+    }
+  } catch (err) {
+    if (err instanceof ApiError) throw err
+    console.warn('[ML] validateVehicle unavailable, skipping check:', err?.message)
+  }
+
+  // Step 4 — AI verification (OpenRouter vision model): does the photo set
+  // match the claimed brand/model/year, do all photos show the same
+  // vehicle. A *confident* mismatch hard-rejects the listing right here
+  // (400, with specific reasons for the client to show in a modal) — this
+  // is the check meant to catch whatever slipped past steps 1-3. A
+  // low/medium-confidence concern does NOT hard-reject, since this model
+  // can be wrong (a purpose-built make/model classifier we evaluated only
+  // hits ~50% top-1 accuracy on this exact kind of judgment) — instead it
+  // gets carried forward and the listing is created as pending_review so
+  // an admin decides, same pattern as an existing fraud High risk flag.
+  // If the check itself is unreachable (network/API failure), skip it
+  // entirely — fail open, same as step 2 — rather than making listing
+  // creation depend on a third-party API's uptime.
+  let verification = null
+  try {
+    verification = await verifyListing({ imagePaths: images, brand, model, year })
+  } catch (err) {
+    console.warn('[ML] verifyListing unavailable, skipping check:', err?.message)
+  }
+
+  const pendingReviewReasons = []
+  if (verification) {
+    const isConfident = verification.match_confidence === 'high'
+    const hasMismatch = !verification.vehicle_matches_claim || !verification.images_consistent
+
+    if (isConfident && hasMismatch) {
+      throw new ApiError(
+        400,
+        'The photos could not be verified against the listing details.',
+        verification.reasons?.length
+          ? verification.reasons
+          : ['The uploaded photos do not appear to match the vehicle described.'],
+      )
+    }
+    if (hasMismatch) {
+      pendingReviewReasons.push(...(verification.reasons?.length
+        ? verification.reasons
+        : ['AI photo review found a possible mismatch with the listing details — needs manual review.']))
+    }
+  }
 
   const listing = await Listing.create({
     seller: req.user._id,
@@ -20,12 +77,40 @@ export const createListing = asyncHandler(async (req, res) => {
     // Normalize to forward slashes: multer's file.path uses the OS
     // separator (backslash on Windows), but this gets served over HTTP
     // via express.static('uploads') and consumed as a URL fragment.
-    images: (req.files || []).map((file) => file.path.replace(/\\/g, '/')),
+    images,
   })
 
   const { ml, status } = await scoreListing(listing, req.user)
+    .catch((err) => {
+      console.error('[ML] scoreListing failed — listing saved as pending_review:', err?.message ?? err)
+      return { ml: {}, status: 'pending_review' }
+    })
+
+  // Cross-check step 3's (condition_assessment CNN) severity read against
+  // step 4's independent one — neither was shown the other's answer. A
+  // disagreement isn't auto-resolved in either direction, it goes to an
+  // admin, same as an unconfident brand/model mismatch above.
+  if (verification && ml.conditionSeverity && verification.severity_assessment
+      && ml.conditionSeverity !== verification.severity_assessment) {
+    pendingReviewReasons.push(
+      `AI photo review assessed "${verification.severity_assessment}" but the condition model assessed `
+      + `"${ml.conditionSeverity}" — flagged for manual comparison.`,
+    )
+  }
+
+  if (verification) {
+    ml.aiVerification = {
+      vehicleMatchesClaim: verification.vehicle_matches_claim,
+      matchConfidence: verification.match_confidence,
+      imagesConsistent: verification.images_consistent,
+      severityAssessment: verification.severity_assessment,
+      damageDescription: verification.damage_description,
+      reviewReasons: pendingReviewReasons,
+    }
+  }
+
   listing.ml = ml
-  listing.status = status
+  listing.status = pendingReviewReasons.length > 0 ? 'pending_review' : status
   await listing.save()
 
   res.status(201).json({ listing })
@@ -82,12 +167,12 @@ export const getListings = asyncHandler(async (req, res) => {
   }
   if (minTrustScore) filter['ml.trustScore'] = { $gte: Number(minTrustScore) }
 
-  const listings = await Listing.find(filter).sort({ createdAt: -1 })
+  const listings = await Listing.find(filter).populate('seller', 'name').sort({ createdAt: -1 })
   res.json({ listings })
 })
 
 export const getMyListings = asyncHandler(async (req, res) => {
-  const listings = await Listing.find({ seller: req.user._id }).sort({ createdAt: -1 })
+  const listings = await Listing.find({ seller: req.user._id }).populate('seller', 'name').sort({ createdAt: -1 })
   res.json({ listings })
 })
 

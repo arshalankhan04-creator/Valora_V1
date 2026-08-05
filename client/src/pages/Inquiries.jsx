@@ -149,9 +149,9 @@ export default function Inquiries() {
 
   if (loading) {
     return (
-      <section className="mx-auto flex max-w-5xl gap-6 px-6 py-8">
+      <section className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:flex-row sm:px-6">
         <span className="sr-only">Loading...</span>
-        <Skeleton className="h-[32rem] w-80 flex-shrink-0 rounded-xl" />
+        <Skeleton className="h-[32rem] w-full rounded-xl sm:w-80 sm:flex-shrink-0" />
         <Skeleton className="h-[32rem] flex-1 rounded-xl" />
       </section>
     )
@@ -159,7 +159,7 @@ export default function Inquiries() {
 
   if (inquiries.length === 0) {
     return (
-      <section className="mx-auto max-w-md px-6 py-24 text-center">
+      <section className="mx-auto max-w-md px-4 py-24 text-center sm:px-6">
         <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-accent">
           <MessageSquare className="size-6 text-primary" />
         </div>
@@ -174,10 +174,16 @@ export default function Inquiries() {
     )
   }
 
+  // On mobile: show list if no conversation selected, show chat if one is selected
+  const showMobileList = !selectedId
+  const showMobileChat = !!selectedId
+
   return (
-    <section className="mx-auto max-w-5xl px-6 py-8">
-      <div className="flex h-[36rem] overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-        <div className="flex w-80 flex-shrink-0 flex-col border-r border-border">
+    <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className="flex h-[calc(100svh-8rem)] overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:h-[36rem]">
+
+        {/* ── Sidebar / conversation list ── */}
+        <div className={`flex w-full flex-shrink-0 flex-col border-r border-border sm:w-80 ${showMobileChat ? 'hidden sm:flex' : 'flex'}`}>
           <div className="flex items-center justify-between px-4 pt-4">
             <h1 className="text-xl font-bold text-foreground">Messages</h1>
             <Button asChild size="sm" variant="outline">
@@ -253,7 +259,8 @@ export default function Inquiries() {
           </ul>
         </div>
 
-        <div className="flex flex-1 flex-col">
+        {/* ── Chat panel ── */}
+        <div className={`flex flex-1 flex-col ${showMobileList ? 'hidden sm:flex' : 'flex'}`}>
           {!selected ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 py-16 text-center">
               <div className="flex size-14 items-center justify-center rounded-full bg-accent">
@@ -288,8 +295,16 @@ export default function Inquiries() {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between gap-4 border-b border-border p-4">
-                <div className="flex min-w-0 items-center gap-3">
+              <div className="flex items-center justify-between gap-2 border-b border-border p-3 sm:gap-4 sm:p-4">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  {/* Mobile back button */}
+                  <Link
+                    to="/inquiries"
+                    className="flex-shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground sm:hidden"
+                    aria-label="Back to conversations"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                  </Link>
                   <Thumbnail src={selected.listing?.images?.[0]} size="size-10" />
                   <div className="min-w-0">
                     <p className="truncate font-medium text-foreground">
@@ -299,15 +314,27 @@ export default function Inquiries() {
                       {formatPrice(selected.listing?.price)} · {formatKm(selected.listing?.kmDriven)}
                     </p>
                   </div>
-                  {selected.listing?.ml?.trustScore != null && <TrustScoreBadge score={selected.listing.ml.trustScore} />}
+                  {selected.listing?.ml?.trustScore != null && (
+                    <span className="hidden sm:block">
+                      <TrustScoreBadge score={selected.listing.ml.trustScore} />
+                    </span>
+                  )}
                 </div>
-                <div className="flex flex-shrink-0 items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleToggleArchive(selected)}>
+                <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handleToggleArchive(selected)} className="hidden sm:inline-flex">
                     {selected.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
                     {selected.archived ? 'Unarchive' : 'Archive'}
                   </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleToggleArchive(selected)} className="sm:hidden" aria-label={selected.archived ? 'Unarchive' : 'Archive'}>
+                    {selected.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+                  </Button>
                   <Button asChild variant="outline" size="sm">
-                    <Link to={`/listings/${selected.listing?._id}`}>View listing</Link>
+                    <Link to={`/listings/${selected.listing?._id}`} className="hidden sm:inline-flex">View listing</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm" className="sm:hidden" aria-label="View listing">
+                    <Link to={`/listings/${selected.listing?._id}`}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -322,7 +349,7 @@ export default function Inquiries() {
                     <div key={msg._id} className={cn('flex flex-col gap-0.5', fromMe ? 'items-end self-end' : 'items-start self-start')}>
                       <div
                         className={cn(
-                          'max-w-xs rounded-2xl px-4 py-2.5 text-sm',
+                          'max-w-[75vw] rounded-2xl px-4 py-2.5 text-sm sm:max-w-xs',
                           fromMe ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground',
                         )}
                       >
@@ -339,7 +366,7 @@ export default function Inquiries() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <form onSubmit={handleReply} className="flex gap-2 border-t border-border p-4">
+              <form onSubmit={handleReply} className="flex gap-2 border-t border-border p-3 sm:p-4">
                 <Input
                   type="text"
                   value={reply}

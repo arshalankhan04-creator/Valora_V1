@@ -30,13 +30,7 @@ const listingSchema = new mongoose.Schema(
     // --- Populated by the Django ML service after creation/update ---
     ml: {
       visualConditionScore: Number,
-      detectedDamages: [
-        {
-          part: String,
-          damageType: String,
-          confidence: Number,
-        },
-      ],
+      conditionSeverity: String,
       predictedPriceMin: Number,
       predictedPriceMax: Number,
       confidenceLevel: String,
@@ -50,6 +44,19 @@ const listingSchema = new mongoose.Schema(
         fraudRisk: Number,
         conditionMatch: Number,
         sellerFactor: Number,
+      },
+      // Step 4 — OpenRouter vision-model verification result, present only
+      // when that check actually ran (absent if the ML service was
+      // unreachable at listing-creation time).
+      aiVerification: {
+        vehicleMatchesClaim: Boolean,
+        matchConfidence: { type: String, enum: ['high', 'medium', 'low'] },
+        imagesConsistent: Boolean,
+        severityAssessment: String,
+        damageDescription: String,
+        // Why this listing was forced into pending_review, if it was —
+        // empty when the AI check found nothing to flag.
+        reviewReasons: [String],
       },
     },
   },

@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createListing } from '../services/listings'
 import ListingForm from '../components/ListingForm'
+import ListingRejectedModal from '../components/ListingRejectedModal'
 
 export default function CreateListing() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [rejectionReasons, setRejectionReasons] = useState(null)
   const navigate = useNavigate()
 
   const handleSubmit = async (form, images) => {
@@ -20,7 +22,14 @@ export default function CreateListing() {
       const listing = await createListing(formData)
       navigate(`/listings/${listing._id}`)
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not create listing')
+      // Step 4's hard rejections carry a `reasons` list — show those in a
+      // dedicated modal instead of a single generic error line.
+      const reasons = err.response?.data?.reasons
+      if (reasons?.length) {
+        setRejectionReasons(reasons)
+      } else {
+        setError(err.response?.data?.message || 'Could not create listing')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -35,6 +44,11 @@ export default function CreateListing() {
         error={error}
         submitLabel="Publish listing"
         submittingLabel="Analyzing listing (price, fraud, condition)..."
+      />
+      <ListingRejectedModal
+        open={Boolean(rejectionReasons)}
+        onOpenChange={(open) => !open && setRejectionReasons(null)}
+        reasons={rejectionReasons ?? []}
       />
     </section>
   )

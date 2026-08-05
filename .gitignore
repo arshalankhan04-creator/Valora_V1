@@ -52,6 +52,12 @@ ml-service/condition_assessment/data/Coco Car Damage Detection Dataset/
 ml-service/condition_assessment/data/images/*.jpg
 !ml-service/condition_assessment/data/images/.gitkeep
 
+# --- Third-party pretrained weights, auto-downloaded on first use ---
+# vehicle_check's YOLOv8n weights (ultralytics downloads to cwd on this
+# setup rather than its usual ~/.cache/ultralytics/) — publicly refetchable,
+# no need to bloat the repo with it.
+ml-service/yolov8n.pt
+
 # --- Uploaded media (created at runtime by server/src/middleware/upload.js) ---
 server/uploads/
 

@@ -1,61 +1,111 @@
-import json
-import os
+"""
+Car condition assessment using beingamit99/car_damage_detection.
 
-from condition_assessment.preprocessing import batch_from_files
-from condition_assessment.train import MODEL_PATH, CLASSES_PATH
+A ViT model fine-tuned to detect 6 specific damage TYPES — Crack, Scratch,
+Tire Flat, Dent, Glass Shatter, Lamp Broken (confirmed directly from the
+model's own id2label at runtime, not just the model card text — the card's
+prose description undersold how different this is from a severity
+classifier). Each label gets its own independent confidence score (a
+multi-label head — the scores don't sum to 1), not a single top-1 choice.
+There is no "whole/undamaged" class and no severity-level class built into
+the model at all. The 0-100 condition score and severity label below are
+derived here from the set of damage types it's confident about, the same
+way the original hand-trained CNN this replaced did it — the model itself
+only answers "how likely is each damage type", nothing more.
 
-DETECTION_THRESHOLD = 0.5
+Model: https://huggingface.co/beingamit99/car_damage_detection
+Downloaded automatically on first use (~350MB), cached in ~/.cache/huggingface/.
 
-_model = None
-_classes = None
+transformers import is deferred to _load() so Django startup doesn't crash
+if the package is installed but the model hasn't been downloaded yet.
+"""
 
+DETECTION_THRESHOLD = 0.5  # per-damage-type confidence to count as "present"
 
-class ModelNotTrainedError(Exception):
-    pass
-
-
-def _load_model():
-    global _model, _classes
-    if _model is None:
-        if not os.path.exists(MODEL_PATH) or not os.path.exists(CLASSES_PATH):
-            raise ModelNotTrainedError(
-                f'No trained model at {MODEL_PATH}. Run `python -m condition_assessment.prepare_data` '
-                'then `python -m condition_assessment.train` first.'
-            )
-        import tensorflow as tf  # deferred: importing TF is slow, only pay for it once needed
-
-        # compile=False: inference only ever calls predict(), never fit()/
-        # evaluate(), and train.py's class-weighted loss is a closure that
-        # isn't registered as a serializable Keras object — loading with
-        # compile=True tries to deserialize it and fails.
-        _model = tf.keras.models.load_model(MODEL_PATH, compile=False)
-        with open(CLASSES_PATH) as f:
-            _classes = json.load(f)
-    return _model, _classes
+# Mirrors server/src/scripts/seed.js's conditionSeverityFor tiers exactly,
+# so real and seeded listings use the same severity vocabulary.
+SEVERITY_TIERS = [
+    (90, 'No visible damage'),
+    (65, 'Minor damage'),
+    (30, 'Moderate damage'),
+]
 
 
-def assess(image_files):
-    model, classes = _load_model()
-    batch = batch_from_files(image_files)
-    predictions = model.predict(batch)  # shape: (num_images, len(classes))
+def _severity_for(score):
+    for threshold, label in SEVERITY_TIERS:
+        if score >= threshold:
+            return label
+    return 'Severe damage'
 
-    detected_damages = []
-    for probs in predictions:
-        for cls, confidence in zip(classes, probs):
-            if confidence >= DETECTION_THRESHOLD:
-                detected_damages.append({
-                    'part': cls['part'],
-                    'damage_type': cls['damage_type'],
-                    'confidence': round(float(confidence), 4),
-                })
 
-    if detected_damages:
-        severity = sum(d['confidence'] for d in detected_damages) / len(detected_damages)
+_pipe = None
+
+
+def _load():
+    global _pipe
+    if _pipe is None:
+        # Deferred import — only load transformers when first request arrives
+        from transformers import pipeline
+        # framework='pt' is required, not optional, in this project: with
+        # TensorFlow/Keras also installed (for price_prediction/
+        # fraud_detection and the original CNN), transformers' framework
+        # auto-detection tries to probe the TF variant of this model first
+        # and crashes (Keras 3 isn't supported without the separate
+        # tf-keras package) — it never even reaches the working PyTorch
+        # weights. Forcing 'pt' skips that probe entirely.
+        _pipe = pipeline(
+            'image-classification',
+            model='beingamit99/car_damage_detection',
+            framework='pt',
+        )
+    return _pipe
+
+
+def _assess_single(image_file) -> dict:
+    """Run the model on one image, return {'score': int, 'severity': str}."""
+    pipe = _load()
+
+    # transformers' image loader only accepts a URL, a base64 string, a
+    # local path, or a PIL Image — a Django UploadedFile (what views.py
+    # actually hands us from request.FILES) is none of those and raises a
+    # TypeError. Decode it to a PIL Image ourselves first, same as
+    # preprocessing.py already does for the original CNN.
+    from PIL import Image
+    image = Image.open(image_file).convert('RGB')
+
+    # top_k=None is documented to return every label, but empirically drops
+    # one on this model/transformers version — ask for the model's own
+    # class count explicitly instead of relying on that.
+    num_labels = pipe.model.config.num_labels
+    results = pipe(image, top_k=num_labels)  # every damage type's own confidence
+
+    detected = [r for r in results if r['score'] >= DETECTION_THRESHOLD]
+    if not detected:
+        score = 95
     else:
-        severity = 0.0
-    visual_condition_score = round(100 * (1 - severity), 2)
+        avg_confidence = sum(r['score'] for r in detected) / len(detected)
+        score = round(100 * (1 - avg_confidence))
+
+    return {'score': score, 'severity': _severity_for(score)}
+
+
+def assess(image_files) -> dict:
+    """
+    Assess all uploaded images and return the worst condition found.
+    Worst = lowest condition score across all images.
+
+    Returns:
+      {
+        'visual_condition_score': int (0-100),
+        'condition_severity':     str (human-readable label),
+      }
+    """
+    assessments = [_assess_single(img) for img in image_files]
+
+    # Use the worst result across all photos — one bad photo matters
+    worst = min(assessments, key=lambda a: a['score'])
 
     return {
-        'visual_condition_score': visual_condition_score,
-        'detected_damages': detected_damages,
+        'visual_condition_score': worst['score'],
+        'condition_severity':     worst['severity'],
     }

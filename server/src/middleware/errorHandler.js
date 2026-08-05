@@ -2,7 +2,9 @@ import ApiError from '../utils/ApiError.js'
 
 export default function errorHandler(err, req, res, next) {
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({ message: err.message })
+    const body = { message: err.message }
+    if (err.reasons?.length) body.reasons = err.reasons
+    return res.status(err.statusCode).json(body)
   }
 
   if (err.name === 'ValidationError') {

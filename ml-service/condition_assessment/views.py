@@ -13,9 +13,5 @@ class AssessConditionView(APIView):
         if not images:
             return Response({'detail': 'At least one image is required'}, status=400)
 
-        try:
-            result = inference.assess(images)
-        except inference.ModelNotTrainedError as exc:
-            return Response({'detail': str(exc)}, status=503)
-
+        result = inference.assess(images)
         return Response(result)

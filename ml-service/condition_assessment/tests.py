@@ -34,18 +34,14 @@ class AssessConditionViewTests(APITestCase):
         )
         self.assertEqual(res.status_code, 400)
 
-    def test_returns_503_when_model_is_not_trained(self):
-        with patch.object(inference, 'assess', side_effect=inference.ModelNotTrainedError('no model')):
-            res = self.client.post(
-                ASSESS_CONDITION_URL, {'images': [fake_image()]}, format='multipart',
-                HTTP_AUTHORIZATION=auth_header(),
-            )
-        self.assertEqual(res.status_code, 503)
+    # No more "model not trained" case — beingamit99/car_damage_detection is
+    # a Hugging Face pipeline downloaded on first use, not a local artifact
+    # this project trains, so ModelNotTrainedError no longer exists.
 
     def test_returns_the_assessment_on_success(self):
         fake_result = {
-            'visual_condition_score': 82.5,
-            'detected_damages': [{'part': 'bumper', 'damage_type': 'scratch', 'confidence': 0.71}],
+            'visual_condition_score': 75,
+            'condition_severity': 'Minor damage',
         }
         with patch.object(inference, 'assess', return_value=fake_result):
             res = self.client.post(

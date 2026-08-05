@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'fraud_detection',
     'condition_assessment',
     'trust_score',
+    'vehicle_check',
+    'listing_verification',
 ]
 
 MIDDLEWARE = [

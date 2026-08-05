@@ -118,11 +118,14 @@ function seedImages(listingIndex, count) {
   return paths
 }
 
-const DAMAGE_TYPES = ['scratch', 'dent', 'rust']
-
-function detectedDamagesFor(conditionScore) {
-  if (conditionScore >= 85) return []
-  return [{ part: 'unknown', damageType: DAMAGE_TYPES[conditionScore % DAMAGE_TYPES.length], confidence: 0.62 + ((100 - conditionScore) % 30) / 100 }]
+// Mirrors condition_assessment/inference.py's LABEL_MAP score tiers
+// (95=whole/no damage, 75=minor, 45=moderate, 15=severe) so seeded
+// conditionSeverity labels agree with the score they're attached to.
+function conditionSeverityFor(conditionScore) {
+  if (conditionScore >= 90) return 'No visible damage'
+  if (conditionScore >= 65) return 'Minor damage'
+  if (conditionScore >= 30) return 'Moderate damage'
+  return 'Severe damage'
 }
 
 // --- Users ----------------------------------------------------------------
@@ -318,7 +321,7 @@ async function seed() {
     }
     if (bp.images > 0) {
       ml.visualConditionScore = bp.condition
-      ml.detectedDamages = detectedDamagesFor(bp.condition)
+      ml.conditionSeverity = conditionSeverityFor(bp.condition)
     }
 
     const doc = await Listing.create({

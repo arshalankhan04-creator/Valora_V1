@@ -23,4 +23,6 @@ urlpatterns = [
     path('api/ml/', include('fraud_detection.urls')),
     path('api/ml/', include('condition_assessment.urls')),
     path('api/ml/', include('trust_score.urls')),
+    path('api/ml/', include('vehicle_check.urls')),
+    path('api/ml/', include('listing_verification.urls')),
 ]

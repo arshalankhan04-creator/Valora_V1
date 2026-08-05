@@ -85,7 +85,7 @@ export default function ListingDetail() {
       </div>
 
       {listing.images?.length > 0 ? (
-        <div className="mb-6 grid grid-cols-3 gap-2">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {listing.images.map((img) => (
             <img
               key={img}
@@ -101,7 +101,7 @@ export default function ListingDetail() {
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             {listing.brand} {listing.model} · {listing.year}
@@ -110,7 +110,7 @@ export default function ListingDetail() {
             {formatKm(listing.kmDriven)} · {listing.fuelType} · {listing.transmission}
           </p>
         </div>
-        <p className="whitespace-nowrap text-2xl font-bold text-foreground">{formatPrice(listing.price)}</p>
+        <p className="text-2xl font-bold text-foreground sm:whitespace-nowrap">{formatPrice(listing.price)}</p>
       </div>
 
       <div className="mt-3 flex items-center gap-2">
@@ -187,20 +187,16 @@ export default function ListingDetail() {
             </CardHeader>
             <CardContent>
               {ml.visualConditionScore != null ? (
-                <>
+                <div className="flex flex-col gap-1">
                   <p className="text-sm text-muted-foreground">
-                    Visual condition score: {ml.visualConditionScore}/100
+                    Visual condition score: <span className="font-medium text-foreground">{ml.visualConditionScore}/100</span>
                   </p>
-                  {ml.detectedDamages?.length > 0 ? (
-                    <ul className="mt-1 list-inside list-disc text-sm text-muted-foreground">
-                      {ml.detectedDamages.map((d, i) => (
-                        <li key={i}>{d.damageType} on {d.part.replace(/_/g, ' ')} ({Math.round(d.confidence * 100)}% confidence)</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No damage detected from photos</p>
+                  {ml.conditionSeverity && (
+                    <p className="text-sm text-muted-foreground">
+                      Assessment: <span className="font-medium text-foreground">{ml.conditionSeverity}</span>
+                    </p>
                   )}
-                </>
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground">No photos to assess</p>
               )}

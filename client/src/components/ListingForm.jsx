@@ -39,12 +39,13 @@ export default function ListingForm({
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (showImages && images.length === 0) return
     onSubmit(form, images)
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
           type="text"
           placeholder="Brand"
@@ -61,7 +62,7 @@ export default function ListingForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
           type="number"
           placeholder="Year"
@@ -78,7 +79,7 @@ export default function ListingForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <select value={form.fuelType} onChange={handleChange('fuelType')} className={SELECT_CLASS}>
           {FUEL_TYPES.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
@@ -104,7 +105,9 @@ export default function ListingForm({
 
       {showImages && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="listing-photos">Photos (up to 8)</Label>
+          <Label htmlFor="listing-photos">
+            Photos (1–8 required)
+          </Label>
           <label
             htmlFor="listing-photos"
             className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-input px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-ring hover:text-foreground"
@@ -117,15 +120,19 @@ export default function ListingForm({
             type="file"
             accept="image/*"
             multiple
+            required
             onChange={(e) => setImages(Array.from(e.target.files).slice(0, 8))}
             className="sr-only"
           />
+          {showImages && images.length === 0 && (
+            <p className="text-xs text-muted-foreground">At least one photo is required.</p>
+          )}
         </div>
       )}
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <Button type="submit" disabled={submitting}>
+      <Button type="submit" disabled={submitting || (showImages && images.length === 0)}>
         {submitting ? submittingLabel : submitLabel}
       </Button>
     </form>

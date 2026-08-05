@@ -51,8 +51,10 @@ sqlparse==0.5.5
 tensorflow==2.21.0
 termcolor==3.3.0
 threadpoolctl==3.6.0
+transformers==4.48.3
 typing_extensions==4.16.0
 tzdata==2026.3
+ultralytics==8.3.169
 urllib3==2.7.0
 wheel==0.47.0
 whitenoise==6.12.0
