@@ -88,7 +88,7 @@ export default function AdminDashboard() {
 
       <div className="flex flex-col gap-3">
         {listings.map((listing) => (
-          <div key={listing._id} className="flex items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
+          <div key={listing._id} className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 flex-1">
               <Link to={`/listings/${listing._id}`} className="font-medium text-foreground hover:underline">
                 {listing.brand} {listing.model} · {listing.year}
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-muted-foreground">
                 {formatPrice(listing.price)} · Seller: {listing.seller?.name} ({listing.seller?.email})
               </p>
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <StatusBadge status={listing.status} />
                 <TrustScoreBadge score={listing.ml?.trustScore} />
                 <RiskFlagBadge flag={listing.ml?.riskFlag} />
@@ -106,9 +106,9 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            <div className="flex flex-shrink-0 flex-col gap-2">
+            <div className="flex flex-shrink-0 flex-row gap-2 sm:flex-col">
               {listing.status !== 'active' && (
-                <Button size="sm" disabled={actioningId === listing._id} onClick={() => handleApprove(listing._id)}>
+                <Button size="sm" disabled={actioningId === listing._id} onClick={() => handleApprove(listing._id)} className="flex-1 sm:flex-none">
                   Approve
                 </Button>
               )}
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
                     variant="outline"
                     size="sm"
                     disabled={actioningId === listing._id}
-                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    className="flex-1 border-destructive/30 text-destructive hover:bg-destructive/10 sm:flex-none"
                   >
                     Remove
                   </Button>

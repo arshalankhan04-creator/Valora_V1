@@ -69,7 +69,7 @@ export default function SellerDashboard() {
 
       <div className="flex flex-col gap-3">
         {listings.map((listing) => (
-          <div key={listing._id} className="flex items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
+          <div key={listing._id} className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 flex-1">
               <Link to={`/listings/${listing._id}`} className="font-medium text-foreground hover:underline">
                 {listing.brand} {listing.model} · {listing.year}
@@ -77,7 +77,7 @@ export default function SellerDashboard() {
               <p className="text-sm text-muted-foreground">
                 {formatPrice(listing.price)} · {formatKm(listing.kmDriven)}
               </p>
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <StatusBadge status={listing.status} />
                 <TrustScoreBadge score={listing.ml?.trustScore} />
                 <RiskFlagBadge flag={listing.ml?.riskFlag} />
@@ -89,14 +89,14 @@ export default function SellerDashboard() {
               )}
             </div>
 
-            <div className="flex flex-shrink-0 flex-col gap-2">
-              <Button asChild variant="outline" size="sm">
+            <div className="flex flex-shrink-0 flex-row gap-2 sm:flex-col">
+              <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
                 <Link to={`/my-listings/${listing._id}/edit`}>Edit</Link>
               </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" disabled={actioningId === listing._id} className="border-destructive/30 text-destructive hover:bg-destructive/10">
+                  <Button variant="outline" size="sm" disabled={actioningId === listing._id} className="flex-1 border-destructive/30 text-destructive hover:bg-destructive/10 sm:flex-none">
                     Delete
                   </Button>
                 </AlertDialogTrigger>

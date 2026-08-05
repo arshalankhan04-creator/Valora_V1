@@ -191,6 +191,38 @@
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-brand;
   }
+
+  /* ── Custom brand scrollbar ── */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(150, 20%, 88%);
+    border-radius: 9999px;
+    transition: background 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(142, 76%, 36%);
+  }
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(150, 20%, 88%) transparent;
+  }
+
+  /* Prevent dropdown/dialog libraries from hiding the scrollbar and shifting the page */
+  html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+  }
+  body {
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable !important;
+  }
 }
 
 @layer components {
