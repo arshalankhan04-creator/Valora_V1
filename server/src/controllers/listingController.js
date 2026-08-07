@@ -9,10 +9,8 @@ export const createListing = asyncHandler(async (req, res) => {
   const { brand, model, year, kmDriven, fuelType, transmission, price, description } = req.body
 
   const images = (req.files || []).map((file) => file.path.replace(/\\/g, '/'))
-  if (images.length === 0) throw new ApiError(400, 'At least one photo is required')
 
   // Basic description sanity check — catches gibberish before any ML runs.
-  // ponytail: regex covers 95% of cases; LLM semantic check only if needed later
   if (description) {
     const d = description.trim()
     const letters = (d.match(/[a-zA-Z]/g) || []).length
@@ -23,15 +21,17 @@ export const createListing = asyncHandler(async (req, res) => {
   }
 
   // Step 2 — vehicle check (YOLOv8, local, no API cost).
-  // If the ML service is down we skip the check rather than blocking the listing.
-  try {
-    const check = await validateVehicle(images)
-    if (!check.valid) {
-      throw new ApiError(400, check.reason ?? 'Photos must show the vehicle being listed.')
+  // If the ML service is down or no images attached, skip check rather than blocking listing.
+  if (images.length > 0) {
+    try {
+      const check = await validateVehicle(images)
+      if (!check.valid) {
+        throw new ApiError(400, check.reason ?? 'Photos must show the vehicle being listed.')
+      }
+    } catch (err) {
+      if (err instanceof ApiError) throw err
+      console.warn('[ML] validateVehicle unavailable, skipping check:', err?.message)
     }
-  } catch (err) {
-    if (err instanceof ApiError) throw err
-    console.warn('[ML] validateVehicle unavailable, skipping check:', err?.message)
   }
 
   // Step 4 — AI verification (OpenRouter vision model): does the photo set

@@ -10,15 +10,20 @@ import errorHandler from './middleware/errorHandler.js'
 
 const app = express()
 
-app.use(helmet())
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
+}))
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
 app.use(express.json())
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'))
-// Helmet's default Cross-Origin-Resource-Policy (same-origin) blocks the
-// Vite client (a different origin) from loading these images — scoped to
-// just this route rather than relaxed app-wide.
+
+// Serve uploaded listing images with cross-origin resource policy enabled
 app.use('/uploads', express.static('uploads', {
-  setHeaders: (res) => res.set('Cross-Origin-Resource-Policy', 'cross-origin'),
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', '*')
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin')
+  },
 }))
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))

@@ -51,7 +51,7 @@ const NEW_LISTING = {
   fuelType: 'Petrol',
   transmission: 'Automatic',
   price: 1500000,
-  description: 'Well maintained',
+  description: 'Well maintained car in excellent condition with complete service history.',
 }
 
 async function registerUser(role) {
