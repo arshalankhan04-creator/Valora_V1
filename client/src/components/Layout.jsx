@@ -43,20 +43,20 @@ const navStyles = `
 
   #valora-nav-pill {
     margin: 0 auto;
-    max-width: 1400px;
+    max-width: 1240px;
     transition: background 0.45s ease, border 0.45s ease,
                 border-radius 0.45s ease, box-shadow 0.45s ease,
                 max-width 0.45s ease, padding 0.45s ease;
   }
   #valora-header.scrolled #valora-nav-pill,
   #valora-header.menu-open #valora-nav-pill {
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 1rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255,255,255,0.9) inset;
-    max-width: 1350px;
+    max-width: 1160px;
   }
 
   #valora-nav-inner {

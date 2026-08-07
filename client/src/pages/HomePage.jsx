@@ -188,206 +188,361 @@ export default function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: '-4.5rem' }}>
-        <img src={heroBg} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: 'none', userSelect: 'none' }} />
-        <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '14rem', background: 'linear-gradient(to bottom, transparent, var(--background))', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1440px', margin: '0 auto', padding: '0 1.5rem', paddingTop: '5rem', paddingBottom: '4rem' }}>
-          {/* pill */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem', background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '9999px', padding: '0.3rem 0.875rem 0.3rem 0.3rem', boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              {AVATARS.map((av, i) => (
-                <div key={av.initials} style={{ width: '1.75rem', height: '1.75rem', borderRadius: '50%', background: av.bg, color: av.color, fontSize: '0.6rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.9)', marginLeft: i === 0 ? 0 : '-0.5rem', zIndex: AVATARS.length - i, position: 'relative', letterSpacing: '0.02em', flexShrink: 0 }}>{av.initials}</div>
-              ))}
+      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950/5 via-background to-slate-100/50 pt-8 pb-16 lg:pt-14 lg:pb-24">
+        {/* Ambient radial glow lights */}
+        <div aria-hidden="true" className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-emerald-400/15 to-teal-400/20 blur-3xl opacity-70" />
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
+
+            {/* Left Col: Hero Content */}
+            <div className="lg:col-span-7 flex flex-col items-start">
+              {/* Trust Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-background/80 px-3.5 py-1.5 text-xs font-semibold text-foreground shadow-sm backdrop-blur-md"
+              >
+                <div className="flex -space-x-2">
+                  {AVATARS.map((av) => (
+                    <div
+                      key={av.initials}
+                      style={{ background: av.bg, color: av.color }}
+                      className="flex size-6 items-center justify-center rounded-full border-2 border-background text-[10px] font-bold"
+                    >
+                      {av.initials}
+                    </div>
+                  ))}
+                </div>
+                <span>Trusted by 10,000+ car buyers & sellers</span>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.1 }}
+                className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]"
+              >
+                Find a used car <br />
+                you can{' '}
+                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent">
+                  actually trust
+                </span>
+              </motion.h1>
+
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.2 }}
+                className="mt-4 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed"
+              >
+                Every car gets an automated fair-price check, a fraud risk flag, and a verified condition score before you ever contact the seller.
+              </motion.p>
+
+              {/* Search Box */}
+              <motion.form
+                onSubmit={handleSearch}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.3 }}
+                className="mt-8 flex w-full max-w-md gap-2 rounded-2xl border border-border bg-card/95 p-2 shadow-lg backdrop-blur-sm"
+              >
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search brand — Honda, Toyota, Maruti..."
+                    className="border-0 bg-transparent pl-9 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
+                  />
+                </div>
+                <Button type="submit" className="rounded-xl px-5 font-semibold">
+                  Search
+                </Button>
+              </motion.form>
+
+              {/* Quick Tags */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.38 }}
+                className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"
+              >
+                <span className="font-medium">Popular:</span>
+                {['Honda City', 'Toyota Fortuner', 'Petrol', 'Under ₹5L'].map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => { setQuery(tag); navigate(`/listings?query=${encodeURIComponent(tag)}`) }}
+                    className="rounded-full border border-border bg-muted/60 px-2.5 py-0.5 transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </motion.div>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.45 }}
+                className="mt-8 flex flex-wrap gap-3"
+              >
+                <Button asChild size="lg" className="rounded-xl font-semibold shadow-brand">
+                  <Link to="/listings">Browse all listings</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-xl font-semibold">
+                  <Link to="/register">Sign up free</Link>
+                </Button>
+              </motion.div>
             </div>
-            <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--foreground)', whiteSpace: 'nowrap' }}>Trusted by thousands of users</span>
-          </motion.div>
-          {/* heading */}
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.11 }} style={{ marginTop: '1.25rem', fontSize: 'clamp(2.5rem, 5.5vw, 4.25rem)', fontWeight: 600, letterSpacing: '-0.035em', lineHeight: 1.08, color: 'var(--foreground)', maxWidth: '700px' }}>
-            Find a used car<br />you can actually<br />trust
-          </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.22 }} style={{ marginTop: '1.25rem', maxWidth: '500px', color: 'var(--muted-foreground)', fontSize: '1.0625rem', lineHeight: 1.65 }}>
-            Every listing gets a fair-price check, a fraud risk flag, and a condition score before you ever message the seller.
-          </motion.p>
-          <motion.form onSubmit={handleSearch} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.33 }} style={{ marginTop: '2rem', display: 'flex', maxWidth: '480px', gap: '0.5rem' }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <Search style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: 'var(--muted-foreground)', pointerEvents: 'none' }} />
-              <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by brand — Honda, Toyota, Maruti..." className="pl-9" />
-            </div>
-            <Button type="submit">Search</Button>
-          </motion.form>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.44 }} style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <Button asChild size="lg"><Link to="/listings">Browse listings</Link></Button>
-            <Button asChild size="lg" variant="outline"><Link to="/register">Sign up free</Link></Button>
-          </motion.div>
+
+            {/* Right Col: Interactive Visual Card Showcase */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="lg:col-span-5 relative"
+            >
+              <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-card via-card to-emerald-500/5 p-4 shadow-2xl backdrop-blur-xl">
+                {/* Hero Car Showcase Image */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-muted/30">
+                  <img
+                    src={heroBg}
+                    alt="Valora Verified Car"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                </div>
+
+                {/* Floating Badge 1 (Top Right): Fraud Status */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="absolute top-8 right-8 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-background/90 px-3 py-2 text-xs font-semibold shadow-lg backdrop-blur-md"
+                >
+                  <ShieldCheck className="size-4 text-emerald-600" />
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Fraud Status</div>
+                    <div className="text-emerald-600 font-bold">0% Risk (Verified)</div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Badge 2 (Bottom Left): AI Trust Score */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="absolute bottom-8 left-8 flex items-center gap-2.5 rounded-xl border border-border bg-background/95 px-3.5 py-2 text-xs font-semibold shadow-lg backdrop-blur-md"
+                >
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold text-sm">
+                    94
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider">AI Trust Score</div>
+                    <div className="font-bold text-foreground">Excellent Match</div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Badge 3 (Bottom Right): Fair Price */}
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="absolute bottom-8 right-8 hidden sm:flex items-center gap-2 rounded-xl border border-border bg-background/90 px-3 py-2 text-xs font-semibold shadow-lg backdrop-blur-md"
+                >
+                  <Gauge className="size-4 text-amber-500" />
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Valuation</div>
+                    <div className="text-foreground font-bold">Fair Market Price</div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
       {/* ── FEATURED LISTINGS ── */}
       {(loading || listings.length > 0) && (
-        <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Featured listings</h2>
-              <p className="mt-1 text-muted-foreground">Real cars, already checked for price, fraud risk, and condition.</p>
+        <section className="w-full bg-slate-50/60 py-16 border-y border-border/50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Featured listings</h2>
+                <p className="mt-1 text-muted-foreground">Real cars, already checked for price, fraud risk, and condition.</p>
+              </div>
+              <Button asChild variant="outline" className="hidden flex-shrink-0 sm:inline-flex"><Link to="/listings">View all</Link></Button>
             </div>
-            <Button asChild variant="outline" className="hidden flex-shrink-0 sm:inline-flex"><Link to="/listings">View all</Link></Button>
-          </div>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-xl" />)
-              : listings.slice(0, 3).map((listing, i) => (
-                  <motion.div key={listing._id} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }}>
-                    <ListingCard listing={listing} />
-                  </motion.div>
-                ))}
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {loading
+                ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-xl" />)
+                : listings.slice(0, 3).map((listing, i) => (
+                    <motion.div key={listing._id} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }}>
+                      <ListingCard listing={listing} />
+                    </motion.div>
+                  ))}
+            </div>
           </div>
         </section>
       )}
 
       {/* ── WHY VALORA ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="max-w-xl">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Why Valora?</h2>
           <p className="mt-2 text-muted-foreground">Four AI checks run on every listing before you ever see it — the same system every car on this site actually goes through, not marketing copy.</p>
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {WHY_FEATURES.map(({ icon: Icon, title, body }, i) => (
-            <motion.div key={title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }} className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <Icon className="size-5 text-primary" />
-              <h3 className="mt-3 font-semibold text-foreground">{title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+            <motion.div key={title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }} className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Icon className="size-5 text-primary" />
+              </div>
+              <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{body}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* ── TRUST SCORE SHOWCASE ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">AI-powered trust scoring</h2>
-            <p className="mt-2 max-w-md text-muted-foreground">Every listing analyzed before you connect. Price fairness, fraud risk, condition, and seller history — combined into one score you can actually check.</p>
-            <Button asChild className="mt-6"><Link to="/listings">See it on real listings</Link></Button>
+      <section className="w-full bg-gradient-to-b from-emerald-50/40 via-background to-transparent py-16 border-y border-border/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">AI-powered trust scoring</h2>
+              <p className="mt-2 max-w-md text-muted-foreground">Every listing analyzed before you connect. Price fairness, fraud risk, condition, and seller history — combined into one score you can actually check.</p>
+              <Button asChild size="lg" className="mt-6 rounded-xl font-semibold"><Link to="/listings">See it on real listings</Link></Button>
+            </div>
+            {loading ? <Skeleton className="h-56 rounded-2xl" /> : (
+              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+                <Card className="shadow-xl border-emerald-500/20">
+                  <CardHeader><CardTitle className="flex items-center justify-between text-base"><span>{tsData.label}</span>{!tsData.isReal && <span className="text-xs font-normal text-muted-foreground">Example</span>}</CardTitle></CardHeader>
+                  <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+                    <div className="text-5xl font-bold text-primary"><AnimatedTrustScore value={tsData.score} /><span className="text-2xl text-muted-foreground">/100</span></div>
+                    <div className="flex-1 space-y-1.5">
+                      <TrustBreakdownRow label="Price fairness"  value={tsData.breakdown?.priceFairness}  max={40} />
+                      <TrustBreakdownRow label="Fraud risk"      value={tsData.breakdown?.fraudRisk}      max={30} />
+                      <TrustBreakdownRow label="Condition match" value={tsData.breakdown?.conditionMatch} max={30} />
+                      <TrustBreakdownRow label="Seller factor"   value={tsData.breakdown?.sellerFactor}   max={5}  />
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </div>
-          {loading ? <Skeleton className="h-56 rounded-2xl" /> : (
-            <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-              <Card className="shadow-brand/60">
-                <CardHeader><CardTitle className="flex items-center justify-between text-base"><span>{tsData.label}</span>{!tsData.isReal && <span className="text-xs font-normal text-muted-foreground">Example</span>}</CardTitle></CardHeader>
-                <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
-                  <div className="text-5xl font-bold text-primary"><AnimatedTrustScore value={tsData.score} /><span className="text-2xl text-muted-foreground">/100</span></div>
-                  <div className="flex-1 space-y-1.5">
-                    <TrustBreakdownRow label="Price fairness"  value={tsData.breakdown?.priceFairness}  max={40} />
-                    <TrustBreakdownRow label="Fraud risk"      value={tsData.breakdown?.fraudRisk}      max={30} />
-                    <TrustBreakdownRow label="Condition match" value={tsData.breakdown?.conditionMatch} max={30} />
-                    <TrustBreakdownRow label="Seller factor"   value={tsData.breakdown?.sellerFactor}   max={5}  />
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
         </div>
       </section>
 
       {/* ── BROWSE BY CATEGORY ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Browse by category</h2>
         <div className="mt-6">
           <p className="text-sm font-medium text-muted-foreground">By fuel type</p>
           <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-6">
             {FUEL_TYPES.map(({ label, value, icon: Icon }) => (
-              <Link key={value} to={`/listings?fuelType=${value}`} className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-colors hover:border-ring hover:bg-accent">
-                <Icon className="size-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">{label}</span>
+              <Link key={value} to={`/listings?fuelType=${value}`} className="flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card p-5 text-center transition-all hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="size-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">{label}</span>
               </Link>
             ))}
           </div>
         </div>
-        <div className="mt-8">
+        <div className="mt-10">
           <p className="text-sm font-medium text-muted-foreground">By budget</p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {PRICE_RANGES.map(({ label, params }) => (
-              <Link key={label} to={`/listings?${toQuery(params)}`} className="rounded-xl border border-border bg-card p-4 text-center font-medium text-foreground transition-colors hover:border-ring hover:bg-accent">{label}</Link>
+              <Link key={label} to={`/listings?${toQuery(params)}`} className="rounded-2xl border border-border bg-card p-4 text-center font-semibold text-foreground transition-all hover:border-emerald-500 hover:shadow-sm">{label}</Link>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-        <h2 className="text-2xl font-bold text-foreground sm:text-3xl">How buying works</h2>
-        <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map(({ icon: Icon, title, body }, i) => {
-            const num = String(i + 1).padStart(2, '0')
-            return (
-              <div key={title} className="flex flex-col items-center text-center">
-                <div style={{ position: 'relative', lineHeight: 1, overflow: 'hidden', paddingRight: '0.1em' }}>
-                  <span style={{ display: 'block', fontSize: 'clamp(4.5rem, 9vw, 7rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: 'var(--color-foreground)', userSelect: 'none', paddingBottom: '0.1em' }}>{num}</span>
-                  <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '32%', background: `linear-gradient(to bottom, transparent 0%, ${BG} 100%)`, pointerEvents: 'none' }} />
+      <section className="w-full bg-slate-50/60 py-16 border-y border-border/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-foreground sm:text-3xl text-center sm:text-left">How buying works</h2>
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map(({ icon: Icon, title, body }, i) => {
+              const num = String(i + 1).padStart(2, '0')
+              return (
+                <div key={title} className="flex flex-col items-center text-center bg-card p-6 rounded-2xl border border-border/60 shadow-sm">
+                  <div style={{ position: 'relative', lineHeight: 1, overflow: 'hidden', paddingRight: '0.1em' }}>
+                    <span style={{ display: 'block', fontSize: 'clamp(3.5rem, 6vw, 5rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: 'var(--color-foreground)', userSelect: 'none', paddingBottom: '0.1em' }}>{num}</span>
+                  </div>
+                  <h3 className="mt-3 font-bold text-foreground">{title}</h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{body}</p>
+                  <div className="mt-4 flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <Icon className="size-4" />
+                  </div>
                 </div>
-                <div aria-hidden="true" style={{ width: '70%', height: '8px', marginTop: '2px', background: 'linear-gradient(to bottom, rgba(0,0,0,0.13), transparent)', filter: 'blur(4px)', borderRadius: '50%', flexShrink: 0 }} />
-                <h3 className="mt-5 font-semibold text-foreground">{title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-                <Icon className="mt-4 size-5 text-muted-foreground" />
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </section>
 
       {/* ── SELLER CTA ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-8 sm:p-12">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-emerald-50/40 p-8 sm:p-12 shadow-lg">
           <div className="relative z-10 max-w-xl">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Selling a car instead?</h2>
-            <p className="mt-2 text-muted-foreground">List your car and it gets the same automatic fair-price check, fraud screening, and condition score buyers already trust — no extra work on your part.</p>
-            <Button asChild size="lg" className="mt-6"><Link to="/register">List your car</Link></Button>
+            <p className="mt-2 text-muted-foreground leading-relaxed">List your car and it gets the same automatic fair-price check, fraud screening, and condition score buyers already trust — no extra work on your part.</p>
+            <Button asChild size="lg" className="mt-6 rounded-xl font-semibold"><Link to="/register">List your car</Link></Button>
           </div>
           <img src={plateImg} alt="" aria-hidden="true" style={{ position: 'absolute', top: '-25%', right: '1%', height: '160%', width: 'auto', objectFit: 'cover', objectPosition: 'top left', pointerEvents: 'none', userSelect: 'none' }} />
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-        <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Frequently asked questions</h2>
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
+        <h2 className="text-2xl font-bold text-foreground sm:text-3xl text-center sm:text-left">Frequently asked questions</h2>
         <Accordion type="single" collapsible className="mt-6">
           {FAQS.map(({ q, a }, i) => (
             <AccordionItem key={q} value={`item-${i}`}>
-              <AccordionTrigger className="text-left">{q}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">{a}</AccordionContent>
+              <AccordionTrigger className="text-left font-semibold text-base">{q}</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground leading-relaxed">{a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
-        <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: 'hsl(45,30%,97%)' }}>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} className="hidden lg:block"
-            style={{ position: 'absolute', right: 'calc(22% - 190px)', top: '-28%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 0 }}>
-            <OrbitIllustration />
-          </motion.div>
-          <div className="relative flex flex-col items-center gap-8 px-8 py-8 lg:flex-row lg:items-center lg:py-10 lg:pl-14 lg:pr-0">
-            <div className="relative z-10 max-w-md flex-shrink-0 text-center lg:text-left">
-              <motion.p initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-sm font-medium uppercase tracking-widest text-primary">Start for free</motion.p>
-              <motion.h2 initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.08 }} className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-r from-emerald-900/90 via-emerald-950 to-slate-900 p-8 lg:p-12 text-white shadow-2xl">
+          <div className="relative flex flex-col items-center gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative z-10 max-w-xl text-center lg:text-left">
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">Start for free</p>
+              <h2 className="mt-2 text-3xl font-extrabold sm:text-4xl text-white">
                 Ready to find a car<br className="hidden sm:block" /> you can trust?
-              </motion.h2>
-              <motion.p initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.14 }} className="mt-3 text-muted-foreground">
+              </h2>
+              <p className="mt-3 text-emerald-100/80 leading-relaxed text-sm sm:text-base">
                 Every listing checked for price, fraud, and condition before you ever message a seller.
-              </motion.p>
-              <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.2 }} className="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start">
-                <Button asChild size="lg"><Link to="/listings">Browse listings</Link></Button>
-                <Button asChild size="lg" variant="outline"><Link to="/register">Sign up free</Link></Button>
-              </motion.div>
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start">
+                <Button asChild size="lg" className="rounded-xl font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400">
+                  <Link to="/listings">Browse listings</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-xl font-semibold border-white/20 text-white hover:bg-white/10">
+                  <Link to="/register">Sign up free</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-border bg-background">
-        <div className="w-full px-6 sm:px-10 lg:px-16 pt-14 pb-8">
+      <footer className="border-t border-border bg-card">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-8">
           <div className="grid gap-12 lg:grid-cols-4">
             <div>
               <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-foreground"><Car className="size-5 text-primary" />Valora</Link>
