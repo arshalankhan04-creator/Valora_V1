@@ -97,7 +97,7 @@ function riskSentiment(flag, reasons) {
 
 function LayoutA({ listing, ml, canContactSeller, sent, sending, message, setMessage, onContact, user }) {
   return (
-    <section className="mx-auto max-w-4xl px-6 py-8">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
       {listing.images?.length > 0 ? (
         <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {listing.images.map(img => (
@@ -268,7 +268,7 @@ function LayoutB({ listing, ml, canContactSeller, sent, sending, message, setMes
   const dLabel = ml.conditionDecision ? decisionLabel(ml.conditionDecision) : null
 
   return (
-    <article className="mx-auto max-w-5xl px-6 py-8">
+    <article className="w-full px-6 sm:px-10 lg:px-16 py-8">
       {/* ── Image strip ── */}
       {listing.images?.length > 0 ? (
         <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
@@ -510,7 +510,7 @@ export default function ListingDetail() {
 
   if (loading) {
     return (
-      <section className="mx-auto max-w-4xl px-6 py-8">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
         <BackButton fallback="/listings" className="mb-4" />
         <span className="sr-only">Loading...</span>
         <Skeleton className="mb-6 aspect-video w-full rounded-lg" />
@@ -521,7 +521,7 @@ export default function ListingDetail() {
   }
   if (error || !listing) {
     return (
-      <section className="mx-auto max-w-4xl px-6 py-12">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-12">
         <BackButton fallback="/listings" className="mb-4" />
         <p className="text-destructive">{error || 'Not found'}</p>
       </section>
@@ -537,7 +537,7 @@ export default function ListingDetail() {
   return (
     <>
       {/* Top nav bar — consistent across both layouts */}
-      <div className="mx-auto max-w-5xl px-6 pt-4 pb-2 flex items-center justify-between gap-4">
+      <div className="w-full px-6 sm:px-10 lg:px-16 pt-4 pb-2 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <BackButton fallback="/listings" />
           <nav aria-label="Breadcrumb" className="hidden items-center gap-1.5 text-sm text-muted-foreground sm:flex">

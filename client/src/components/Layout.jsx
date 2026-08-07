@@ -43,7 +43,7 @@ const navStyles = `
 
   #valora-nav-pill {
     margin: 0 auto;
-    max-width: 1200px;
+    max-width: 1400px;
     transition: background 0.45s ease, border 0.45s ease,
                 border-radius 0.45s ease, box-shadow 0.45s ease,
                 max-width 0.45s ease, padding 0.45s ease;
@@ -56,7 +56,7 @@ const navStyles = `
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 1rem;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255,255,255,0.9) inset;
-    max-width: 1100px;
+    max-width: 1350px;
   }
 
   #valora-nav-inner {

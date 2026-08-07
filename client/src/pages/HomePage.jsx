@@ -191,7 +191,7 @@ export default function HomePage() {
       <section style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'center', overflow: 'hidden', marginTop: '-4.5rem' }}>
         <img src={heroBg} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', pointerEvents: 'none', userSelect: 'none' }} />
         <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '14rem', background: 'linear-gradient(to bottom, transparent, var(--background))', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1152px', margin: '0 auto', padding: '0 1.5rem', paddingTop: '5rem', paddingBottom: '4rem' }}>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1440px', margin: '0 auto', padding: '0 1.5rem', paddingTop: '5rem', paddingBottom: '4rem' }}>
           {/* pill */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem', background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '9999px', padding: '0.3rem 0.875rem 0.3rem 0.3rem', boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
@@ -225,7 +225,7 @@ export default function HomePage() {
 
       {/* ── FEATURED LISTINGS ── */}
       {(loading || listings.length > 0) && (
-        <section className="mx-auto max-w-6xl px-6 py-16">
+        <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Featured listings</h2>
@@ -246,7 +246,7 @@ export default function HomePage() {
       )}
 
       {/* ── WHY VALORA ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <div className="max-w-xl">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Why Valora?</h2>
           <p className="mt-2 text-muted-foreground">Four AI checks run on every listing before you ever see it — the same system every car on this site actually goes through, not marketing copy.</p>
@@ -263,7 +263,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TRUST SCORE SHOWCASE ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">AI-powered trust scoring</h2>
@@ -290,7 +290,7 @@ export default function HomePage() {
       </section>
 
       {/* ── BROWSE BY CATEGORY ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Browse by category</h2>
         <div className="mt-6">
           <p className="text-sm font-medium text-muted-foreground">By fuel type</p>
@@ -314,7 +314,7 @@ export default function HomePage() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <h2 className="text-2xl font-bold text-foreground sm:text-3xl">How buying works</h2>
         <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ icon: Icon, title, body }, i) => {
@@ -336,7 +336,7 @@ export default function HomePage() {
       </section>
 
       {/* ── SELLER CTA ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-8 sm:p-12">
           <div className="relative z-10 max-w-xl">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Selling a car instead?</h2>
@@ -348,7 +348,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="mx-auto max-w-3xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Frequently asked questions</h2>
         <Accordion type="single" collapsible className="mt-6">
           {FAQS.map(({ q, a }, i) => (
@@ -361,7 +361,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-16">
         <div className="relative overflow-hidden rounded-2xl border border-border" style={{ background: 'hsl(45,30%,97%)' }}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} className="hidden lg:block"
             style={{ position: 'absolute', right: 'calc(22% - 190px)', top: '-28%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 0 }}>
@@ -387,7 +387,7 @@ export default function HomePage() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-border bg-background">
-        <div className="mx-auto max-w-6xl px-6 pt-14 pb-8">
+        <div className="w-full px-6 sm:px-10 lg:px-16 pt-14 pb-8">
           <div className="grid gap-12 lg:grid-cols-4">
             <div>
               <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-foreground"><Car className="size-5 text-primary" />Valora</Link>

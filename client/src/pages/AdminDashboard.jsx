@@ -67,7 +67,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-8">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
       <h1 className="mb-4 text-2xl font-bold text-foreground">Admin — Listing moderation</h1>
 
       <select value={status} onChange={(e) => setStatus(e.target.value)} className={`${SELECT_CLASS} mb-6`}>

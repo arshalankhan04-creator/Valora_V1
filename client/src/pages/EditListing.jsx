@@ -25,7 +25,7 @@ export default function EditListing() {
 
   if (loading) {
     return (
-      <section className="mx-auto max-w-lg px-6 py-8">
+      <section className="w-full max-w-3xl mx-auto px-6 sm:px-10 py-8">
         <BackButton fallback="/my-listings" className="mb-4" />
         <p className="text-muted-foreground">Loading...</p>
       </section>
@@ -33,7 +33,7 @@ export default function EditListing() {
   }
   if (loadError) {
     return (
-      <section className="mx-auto max-w-lg px-6 py-8">
+      <section className="w-full max-w-3xl mx-auto px-6 sm:px-10 py-8">
         <BackButton fallback="/my-listings" className="mb-4" />
         <p className="text-destructive">{loadError}</p>
       </section>
@@ -44,7 +44,7 @@ export default function EditListing() {
   const isOwner = sellerId === user.id
   if (!isOwner && user.role !== 'admin') {
     return (
-      <section className="mx-auto max-w-lg px-6 py-8">
+      <section className="w-full max-w-3xl mx-auto px-6 sm:px-10 py-8">
         <BackButton fallback="/my-listings" className="mb-4" />
         <p className="text-destructive">This isn't your listing to edit.</p>
       </section>
@@ -76,7 +76,7 @@ export default function EditListing() {
   }
 
   return (
-    <section className="mx-auto max-w-lg px-6 py-8">
+    <section className="w-full max-w-3xl mx-auto px-6 sm:px-10 py-8">
       <BackButton fallback="/my-listings" className="mb-4" />
       <h1 className="mb-2 text-2xl font-bold text-foreground">Edit listing</h1>
       <p className="mb-6 text-sm text-muted-foreground">

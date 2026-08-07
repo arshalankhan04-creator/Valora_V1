@@ -149,7 +149,7 @@ export default function Inquiries() {
 
   if (loading) {
     return (
-      <section className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:flex-row sm:px-6">
+      <section className="w-full flex flex-col gap-6 px-6 sm:px-10 lg:px-16 py-8 sm:flex-row">
         <span className="sr-only">Loading...</span>
         <Skeleton className="h-[32rem] w-full rounded-xl sm:w-80 sm:flex-shrink-0" />
         <Skeleton className="h-[32rem] flex-1 rounded-xl" />
@@ -179,7 +179,7 @@ export default function Inquiries() {
   const showMobileChat = !!selectedId
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
       <div className="flex h-[calc(100svh-8rem)] overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:h-[36rem]">
 
         {/* ── Sidebar / conversation list ── */}

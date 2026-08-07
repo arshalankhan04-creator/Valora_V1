@@ -122,7 +122,7 @@ export default function Listings() {
   )
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <div className="w-full px-6 sm:px-10 lg:px-16 py-10">
 
       {/* Page header */}
       <div className="flex items-end justify-between gap-4">

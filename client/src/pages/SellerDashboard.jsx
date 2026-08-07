@@ -46,7 +46,7 @@ export default function SellerDashboard() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-8">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">My listings</h1>
         <Button asChild size="sm">

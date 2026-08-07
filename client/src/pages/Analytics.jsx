@@ -57,7 +57,7 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <section className="mx-auto max-w-5xl px-6 py-8">
+      <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
         <span className="sr-only">Loading...</span>
         <div className="grid gap-4 sm:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
@@ -70,7 +70,7 @@ export default function Analytics() {
   const noData = Object.values(data).every((group) => group.length === 0)
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-8">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-8">
       <h1 className="mb-1 text-2xl font-bold text-foreground">Market analytics</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         Live price trends across every active listing on Valora, not historical training data.

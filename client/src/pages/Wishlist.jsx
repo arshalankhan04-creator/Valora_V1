@@ -33,7 +33,7 @@ export default function Wishlist() {
   const visibleListings = listings.filter((l) => wishlistIds.has(l._id))
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-10">
+    <section className="w-full px-6 sm:px-10 lg:px-16 py-10">
       <h1 className="text-3xl font-bold text-foreground">My wishlist</h1>
 
       {loading && (
