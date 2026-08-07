@@ -1,7 +1,0 @@
-torch
-diffusers
-transformers
-accelerate
-safetensors
-invisible-watermark
-huggingface_hub
