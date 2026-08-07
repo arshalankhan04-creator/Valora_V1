@@ -1,0 +1,1565 @@
+{
+  "Maruti Suzuki": {
+    "models": [
+      "Alto",
+      "Alto K10",
+      "800",
+      "Omni",
+      "Eeco",
+      "Zen",
+      "Zen Estilo",
+      "A-Star",
+      "Celerio",
+      "Celerio X",
+      "WagonR",
+      "Ritz",
+      "Swift",
+      "Swift Dzire",
+      "Dzire",
+      "Baleno",
+      "Ignis",
+      "S-Presso",
+      "Fronx",
+      "Brezza",
+      "Grand Vitara",
+      "S-Cross",
+      "Ertiga",
+      "XL6",
+      "Jimny",
+      "Kizashi",
+      "Esteem",
+      "Versa",
+      "Gypsy",
+      "Invicto"
+    ],
+    "price_range_inr": {
+      "min": 50000,
+      "max": 3500000
+    }
+  },
+  "Hyundai": {
+    "models": [
+      "Santro",
+      "Santro Xing",
+      "Eon",
+      "i10",
+      "Grand i10",
+      "Grand i10 Nios",
+      "i20",
+      "Elite i20",
+      "i20 N Line",
+      "Getz",
+      "Accent",
+      "Verna",
+      "Aura",
+      "Xcent",
+      "Venue",
+      "Venue N Line",
+      "Creta",
+      "Alcazar",
+      "Exter",
+      "Tucson",
+      "Kona Electric",
+      "Ioniq 5",
+      "Elantra",
+      "Sonata"
+    ],
+    "price_range_inr": {
+      "min": 70000,
+      "max": 5000000
+    }
+  },
+  "Tata Motors": {
+    "models": [
+      "Nano",
+      "Indica",
+      "Indica Vista",
+      "Indigo",
+      "Indigo Marina",
+      "Manza",
+      "Bolt",
+      "Zest",
+      "Tiago",
+      "Tigor",
+      "Altroz",
+      "Punch",
+      "Nexon",
+      "Nexon EV",
+      "Curvv",
+      "Curvv EV",
+      "Harrier",
+      "Safari",
+      "Hexa",
+      "Aria",
+      "Sierra (Classic)",
+      "Sierra EV",
+      "Sumo",
+      "Sumo Gold",
+      "Safari Storme",
+      "Winger",
+      "Magic",
+      "Xenon"
+    ],
+    "price_range_inr": {
+      "min": 40000,
+      "max": 3500000
+    }
+  },
+  "Mahindra": {
+    "models": [
+      "Thar",
+      "Thar Roxx",
+      "Scorpio",
+      "Scorpio Classic",
+      "Scorpio N",
+      "XUV 3XO",
+      "XUV300",
+      "XUV500",
+      "XUV700",
+      "XUV.e8",
+      "Bolero",
+      "Bolero Neo",
+      "Bolero Pik-Up",
+      "BE 6",
+      "XEV 9e",
+      "Marazzo",
+      "Quanto",
+      "TUV300",
+      "KUV100",
+      "Xylo",
+      "Logan",
+      "Verito",
+      "Alturas G4",
+      "Armada",
+      "Commander"
+    ],
+    "price_range_inr": {
+      "min": 70000,
+      "max": 4000000
+    }
+  },
+  "Toyota": {
+    "models": [
+      "Innova",
+      "Innova Crysta",
+      "Innova Hycross",
+      "Fortuner",
+      "Hilux",
+      "Glanza",
+      "Urban Cruiser",
+      "Urban Cruiser Hyryder",
+      "Camry",
+      "Corolla",
+      "Corolla Altis",
+      "Yaris",
+      "Etios",
+      "Etios Liva",
+      "Rumion",
+      "Land Cruiser Prado",
+      "Land Cruiser",
+      "Vellfire",
+      "Prius",
+      "Qualis"
+    ],
+    "price_range_inr": {
+      "min": 120000,
+      "max": 30000000
+    }
+  },
+  "Kia": {
+    "models": [
+      "Seltos",
+      "Sonet",
+      "Carens",
+      "Carens Clavis",
+      "Syros",
+      "Carnival",
+      "EV6",
+      "EV9"
+    ],
+    "price_range_inr": {
+      "min": 700000,
+      "max": 14000000
+    }
+  },
+  "Honda": {
+    "models": [
+      "City",
+      "City ZX",
+      "City Hybrid",
+      "Amaze",
+      "Jazz",
+      "WR-V",
+      "Elevate",
+      "Civic",
+      "Accord",
+      "CR-V",
+      "BR-V",
+      "Mobilio",
+      "Brio"
+    ],
+    "price_range_inr": {
+      "min": 100000,
+      "max": 4500000
+    }
+  },
+  "Renault": {
+    "models": [
+      "Kwid",
+      "Kiger",
+      "Triber",
+      "Duster",
+      "Lodgy",
+      "Pulse",
+      "Scala",
+      "Fluence",
+      "Koleos"
+    ],
+    "price_range_inr": {
+      "min": 80000,
+      "max": 1800000
+    }
+  },
+  "Nissan": {
+    "models": [
+      "Magnite",
+      "Micra",
+      "Micra Active",
+      "Sunny",
+      "Terrano",
+      "Kicks",
+      "Evalia",
+      "X-Trail",
+      "GT-R"
+    ],
+    "price_range_inr": {
+      "min": 90000,
+      "max": 25000000
+    }
+  },
+  "Škoda": {
+    "models": [
+      "Kylaq",
+      "Kushaq",
+      "Slavia",
+      "Rapid",
+      "Laura",
+      "Octavia",
+      "Superb",
+      "Yeti",
+      "Karoq",
+      "Kodiaq",
+      "Fabia"
+    ],
+    "price_range_inr": {
+      "min": 150000,
+      "max": 4500000
+    }
+  },
+  "Volkswagen": {
+    "models": [
+      "Polo",
+      "Virtus",
+      "Vento",
+      "Ameo",
+      "Taigun",
+      "Tiguan",
+      "Passat",
+      "Jetta",
+      "Beetle",
+      "T-Roc"
+    ],
+    "price_range_inr": {
+      "min": 150000,
+      "max": 4500000
+    }
+  },
+  "MG Motor": {
+    "models": [
+      "Comet EV",
+      "Windsor EV",
+      "ZS EV",
+      "Astor",
+      "Hector",
+      "Hector Plus",
+      "Gloster",
+      "M9",
+      "Cyberster"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 8000000
+    }
+  },
+  "BMW": {
+    "models": [
+      "2 Series",
+      "3 Series",
+      "5 Series",
+      "6 Series GT",
+      "7 Series",
+      "X1",
+      "X3",
+      "X5",
+      "X7",
+      "XM",
+      "Z4",
+      "i4",
+      "i5",
+      "i7",
+      "iX"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 25000000
+    }
+  },
+  "Mercedes-Benz": {
+    "models": [
+      "A-Class",
+      "C-Class",
+      "E-Class",
+      "S-Class",
+      "CLA",
+      "GLA",
+      "GLB",
+      "GLC",
+      "GLE",
+      "GLS",
+      "G-Class",
+      "AMG GT",
+      "EQA",
+      "EQB",
+      "EQE",
+      "EQS"
+    ],
+    "price_range_inr": {
+      "min": 1000000,
+      "max": 40000000
+    }
+  },
+  "Audi": {
+    "models": [
+      "A3",
+      "A4",
+      "A6",
+      "A8",
+      "Q2",
+      "Q3",
+      "Q5",
+      "Q7",
+      "Q8",
+      "RS5",
+      "RS Q8",
+      "e-tron",
+      "Q8 e-tron"
+    ],
+    "price_range_inr": {
+      "min": 900000,
+      "max": 25000000
+    }
+  },
+  "Volvo": {
+    "models": [
+      "EX30",
+      "EX40",
+      "XC40",
+      "XC60",
+      "XC90",
+      "S90",
+      "C40 Recharge"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 12000000
+    }
+  },
+  "Jeep": {
+    "models": [
+      "Compass",
+      "Meridian",
+      "Wrangler",
+      "Grand Cherokee"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 9000000
+    }
+  },
+  "Lexus": {
+    "models": [
+      "ES",
+      "LS",
+      "NX",
+      "RX",
+      "LX",
+      "LM"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 30000000
+    }
+  },
+  "Land Rover": {
+    "models": [
+      "Defender",
+      "Discovery Sport",
+      "Discovery",
+      "Range Rover Evoque",
+      "Range Rover Velar",
+      "Range Rover Sport",
+      "Range Rover"
+    ],
+    "price_range_inr": {
+      "min": 1800000,
+      "max": 35000000
+    }
+  },
+  "Jaguar": {
+    "models": [
+      "XE",
+      "XF",
+      "XJ",
+      "F-Pace",
+      "E-Pace",
+      "I-Pace",
+      "F-Type"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 12000000
+    }
+  },
+  "Porsche": {
+    "models": [
+      "718 Cayman",
+      "718 Boxster",
+      "911",
+      "Panamera",
+      "Macan",
+      "Cayenne",
+      "Taycan"
+    ],
+    "price_range_inr": {
+      "min": 3000000,
+      "max": 35000000
+    }
+  },
+  "MINI": {
+    "models": [
+      "Cooper 3-Door",
+      "Cooper 5-Door",
+      "Cooper S",
+      "Countryman",
+      "Clubman",
+      "Convertible",
+      "Electric Cooper"
+    ],
+    "price_range_inr": {
+      "min": 1500000,
+      "max": 6000000
+    }
+  },
+  "BYD": {
+    "models": [
+      "Atto 3",
+      "Seal",
+      "Sealion 7",
+      "eMAX 7",
+      "Dolphin"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 4500000
+    }
+  },
+  "Citroën": {
+    "models": [
+      "C3",
+      "ë-C3",
+      "C3 Aircross",
+      "Basalt",
+      "C5 Aircross"
+    ],
+    "price_range_inr": {
+      "min": 400000,
+      "max": 2500000
+    }
+  },
+  "Isuzu": {
+    "models": [
+      "D-Max",
+      "V-Cross",
+      "MU-X",
+      "Hi-Lander"
+    ],
+    "price_range_inr": {
+      "min": 700000,
+      "max": 3500000
+    }
+  },
+  "Force Motors": {
+    "models": [
+      "Gurkha",
+      "Gurkha 5-Door",
+      "Trax",
+      "Traveller",
+      "Cruiser",
+      "Citiline"
+    ],
+    "price_range_inr": {
+      "min": 200000,
+      "max": 2500000
+    }
+  },
+  "Ferrari": {
+    "models": [
+      "296 GTB",
+      "296 GTS",
+      "Roma",
+      "Portofino M",
+      "F8 Tributo",
+      "SF90 Stradale",
+      "SF90 Spider",
+      "812 Superfast",
+      "Purosangue",
+      "LaFerrari"
+    ],
+    "price_range_inr": {
+      "min": 15000000,
+      "max": 80000000
+    }
+  },
+  "Lamborghini": {
+    "models": [
+      "Huracán",
+      "Huracán STO",
+      "Revuelto",
+      "Aventador",
+      "Temerario",
+      "Urus",
+      "Gallardo",
+      "Murciélago"
+    ],
+    "price_range_inr": {
+      "min": 18000000,
+      "max": 90000000
+    }
+  },
+  "Rolls-Royce": {
+    "models": [
+      "Ghost",
+      "Phantom",
+      "Cullinan",
+      "Spectre",
+      "Dawn",
+      "Wraith"
+    ],
+    "price_range_inr": {
+      "min": 25000000,
+      "max": 120000000
+    }
+  },
+  "Bentley": {
+    "models": [
+      "Continental GT",
+      "Flying Spur",
+      "Bentayga",
+      "Mulsanne",
+      "Continental GTC"
+    ],
+    "price_range_inr": {
+      "min": 15000000,
+      "max": 60000000
+    }
+  },
+  "Maserati": {
+    "models": [
+      "Ghibli",
+      "Quattroporte",
+      "Levante",
+      "Grecale",
+      "GranTurismo",
+      "MC20"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 35000000
+    }
+  },
+  "Aston Martin": {
+    "models": [
+      "DB11",
+      "DB12",
+      "Vantage",
+      "Vanquish",
+      "DBS Superleggera",
+      "DBX"
+    ],
+    "price_range_inr": {
+      "min": 8000000,
+      "max": 50000000
+    }
+  },
+  "McLaren": {
+    "models": [
+      "GT",
+      "Artura",
+      "570S",
+      "600LT",
+      "720S",
+      "750S",
+      "P1",
+      "Senna"
+    ],
+    "price_range_inr": {
+      "min": 12000000,
+      "max": 120000000
+    }
+  },
+  "Bugatti": {
+    "models": [
+      "Veyron",
+      "Chiron",
+      "Divo",
+      "Bolide",
+      "Tourbillon"
+    ],
+    "price_range_inr": {
+      "min": 80000000,
+      "max": 500000000
+    }
+  },
+  "Lotus": {
+    "models": [
+      "Elise",
+      "Exige",
+      "Evora",
+      "Emira",
+      "Eletre",
+      "Evija"
+    ],
+    "price_range_inr": {
+      "min": 3000000,
+      "max": 25000000
+    }
+  },
+  "Peugeot": {
+    "models": [
+      "206",
+      "207",
+      "208",
+      "308",
+      "3008",
+      "5008",
+      "508"
+    ],
+    "price_range_inr": {
+      "min": 200000,
+      "max": 3000000
+    }
+  },
+  "Fiat": {
+    "models": [
+      "Uno",
+      "Palio",
+      "Palio Stile",
+      "Siena",
+      "Petra",
+      "Punto",
+      "Punto Evo",
+      "Linea",
+      "Avventura",
+      "Abarth Punto"
+    ],
+    "price_range_inr": {
+      "min": 70000,
+      "max": 1200000
+    }
+  },
+  "Chevrolet": {
+    "models": [
+      "Spark",
+      "Beat",
+      "Sail",
+      "Sail UVA",
+      "Cruze",
+      "Aveo",
+      "Aveo U-VA",
+      "Optra",
+      "Captiva",
+      "Enjoy",
+      "Tavera",
+      "Trailblazer",
+      "Forester"
+    ],
+    "price_range_inr": {
+      "min": 60000,
+      "max": 2500000
+    }
+  },
+  "Ford": {
+    "models": [
+      "Figo",
+      "Figo Aspire",
+      "Fiesta",
+      "Fiesta Classic",
+      "Ikon",
+      "Freestyle",
+      "EcoSport",
+      "Endeavour",
+      "Fusion",
+      "Mondeo",
+      "Mustang",
+      "Escort"
+    ],
+    "price_range_inr": {
+      "min": 80000,
+      "max": 8000000
+    }
+  },
+  "Mitsubishi": {
+    "models": [
+      "Pajero",
+      "Pajero Sport",
+      "Outlander",
+      "Lancer",
+      "Lancer Evolution (Evo)",
+      "Cedia",
+      "Montero",
+      "Eclipse Cross"
+    ],
+    "price_range_inr": {
+      "min": 250000,
+      "max": 5000000
+    }
+  },
+  "Datsun": {
+    "models": [
+      "GO",
+      "GO+",
+      "redi-GO",
+      "Sunny",
+      "Bluebird",
+      "120Y"
+    ],
+    "price_range_inr": {
+      "min": 80000,
+      "max": 700000
+    }
+  },
+  "Opel": {
+    "models": [
+      "Astra",
+      "Corsa",
+      "Vectra",
+      "Corsa Sail",
+      "Swing"
+    ],
+    "price_range_inr": {
+      "min": 50000,
+      "max": 400000
+    }
+  },
+  "Hindustan Motors": {
+    "models": [
+      "Ambassador",
+      "Contessa",
+      "Trekker",
+      "Landmaster",
+      "Avigo"
+    ],
+    "price_range_inr": {
+      "min": 100000,
+      "max": 1500000
+    }
+  },
+  "Premier": {
+    "models": [
+      "Padmini",
+      "Rio",
+      "118 NE",
+      "Sigma"
+    ],
+    "price_range_inr": {
+      "min": 50000,
+      "max": 500000
+    }
+  },
+  "Daewoo": {
+    "models": [
+      "Matiz",
+      "Cielo",
+      "Nexia",
+      "Espero"
+    ],
+    "price_range_inr": {
+      "min": 40000,
+      "max": 300000
+    }
+  },
+  "SsangYong": {
+    "models": [
+      "Rexton",
+      "Korando",
+      "Tivoli",
+      "Musso"
+    ],
+    "price_range_inr": {
+      "min": 400000,
+      "max": 2500000
+    }
+  },
+  "Chrysler": {
+    "models": [
+      "300",
+      "300C",
+      "Pacifica",
+      "Voyager",
+      "Crossfire"
+    ],
+    "price_range_inr": {
+      "min": 600000,
+      "max": 5000000
+    }
+  },
+  "Dodge": {
+    "models": [
+      "Challenger",
+      "Charger",
+      "Durango",
+      "Viper",
+      "Journey",
+      "Nitro"
+    ],
+    "price_range_inr": {
+      "min": 1000000,
+      "max": 25000000
+    }
+  },
+  "Ram": {
+    "models": [
+      "1500",
+      "2500",
+      "3500",
+      "TRX",
+      "ProMaster"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 30000000
+    }
+  },
+  "Lincoln": {
+    "models": [
+      "Navigator",
+      "Aviator",
+      "Corsair",
+      "Nautilus",
+      "Continental",
+      "MKZ"
+    ],
+    "price_range_inr": {
+      "min": 1500000,
+      "max": 12000000
+    }
+  },
+  "Cadillac": {
+    "models": [
+      "Escalade",
+      "CT4",
+      "CT5",
+      "XT4",
+      "XT5",
+      "XT6",
+      "Lyriq",
+      "Celestiq"
+    ],
+    "price_range_inr": {
+      "min": 2000000,
+      "max": 30000000
+    }
+  },
+  "GMC": {
+    "models": [
+      "Yukon",
+      "Sierra",
+      "Canyon",
+      "Acadia",
+      "Terrain",
+      "Hummer EV"
+    ],
+    "price_range_inr": {
+      "min": 2000000,
+      "max": 30000000
+    }
+  },
+  "Buick": {
+    "models": [
+      "Encore",
+      "Envision",
+      "Enclave",
+      "Regal",
+      "LaCrosse"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 5000000
+    }
+  },
+  "Tesla": {
+    "models": [
+      "Model S",
+      "Model 3",
+      "Model X",
+      "Model Y",
+      "Cybertruck",
+      "Roadster"
+    ],
+    "price_range_inr": {
+      "min": 1800000,
+      "max": 15000000
+    }
+  },
+  "Rivian": {
+    "models": [
+      "R1T",
+      "R1S",
+      "R2",
+      "R3",
+      "R3X"
+    ],
+    "price_range_inr": {
+      "min": 3500000,
+      "max": 9000000
+    }
+  },
+  "Lucid": {
+    "models": [
+      "Air",
+      "Gravity"
+    ],
+    "price_range_inr": {
+      "min": 5000000,
+      "max": 12000000
+    }
+  },
+  "VinFast": {
+    "models": [
+      "VF 3",
+      "VF 5",
+      "VF 6",
+      "VF 7",
+      "VF 8",
+      "VF 9"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 5000000
+    }
+  },
+  "Chery": {
+    "models": [
+      "Tiggo 2",
+      "Tiggo 4",
+      "Tiggo 7",
+      "Tiggo 8",
+      "Arrizo 5",
+      "QQ"
+    ],
+    "price_range_inr": {
+      "min": 300000,
+      "max": 2500000
+    }
+  },
+  "Geely": {
+    "models": [
+      "Coolray",
+      "Emgrand",
+      "Okavango",
+      "Xingyue L",
+      "Panda Mini"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 3000000
+    }
+  },
+  "GWM (Great Wall Motors)": {
+    "models": [
+      "Haval H6",
+      "Haval Jolion",
+      "Haval H9",
+      "Ora Good Cat",
+      "Tank 300",
+      "Poer"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 5000000
+    }
+  },
+  "Haval": {
+    "models": [
+      "H2",
+      "H6",
+      "H9",
+      "Jolion",
+      "Dargo"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 3500000
+    }
+  },
+  "BAIC": {
+    "models": [
+      "BJ40",
+      "BJ60",
+      "X35",
+      "X55",
+      "EU5",
+      "Arcfox α-T"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 4000000
+    }
+  },
+  "Dongfeng": {
+    "models": [
+      "Fengon 580",
+      "Fengon ix5",
+      "Aeolus Yixuan",
+      "Rich 6",
+      "Nano Box",
+      "M-Hero 917"
+    ],
+    "price_range_inr": {
+      "min": 600000,
+      "max": 12000000
+    }
+  },
+  "FAW": {
+    "models": [
+      "Bestune T77",
+      "Bestune B70",
+      "Hongqi H5",
+      "Hongqi H9",
+      "Hongqi E-HS9"
+    ],
+    "price_range_inr": {
+      "min": 700000,
+      "max": 9000000
+    }
+  },
+  "JAC Motors": {
+    "models": [
+      "T6",
+      "T8",
+      "JS4",
+      "JS6",
+      "J7",
+      "iEV7S"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 3000000
+    }
+  },
+  "XPeng": {
+    "models": [
+      "G3",
+      "G6",
+      "G9",
+      "P5",
+      "P7",
+      "Mona M03",
+      "X9"
+    ],
+    "price_range_inr": {
+      "min": 1800000,
+      "max": 6000000
+    }
+  },
+  "NIO": {
+    "models": [
+      "ET5",
+      "ET5 Touring",
+      "ET7",
+      "ET9",
+      "ES6",
+      "ES7",
+      "ES8",
+      "EC6",
+      "EL6",
+      "EL8",
+      "EP9"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 15000000
+    }
+  },
+  "Li Auto": {
+    "models": [
+      "L6",
+      "L7",
+      "L8",
+      "L9",
+      "Mega"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 7000000
+    }
+  },
+  "Zeekr": {
+    "models": [
+      "001",
+      "007",
+      "009",
+      "X",
+      "7X"
+    ],
+    "price_range_inr": {
+      "min": 2500000,
+      "max": 7000000
+    }
+  },
+  "SAIC": {
+    "models": [
+      "Roewe RX5",
+      "Roewe i5",
+      "Roewe D7",
+      "Maxus MIFA 9",
+      "Maxus T90",
+      "Maxus Deliver 9"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 5000000
+    }
+  },
+  "Roewe": {
+    "models": [
+      "RX5",
+      "RX8",
+      "i5",
+      "i6",
+      "D7",
+      "Marvel R"
+    ],
+    "price_range_inr": {
+      "min": 700000,
+      "max": 3500000
+    }
+  },
+  "Wuling": {
+    "models": [
+      "Hongguang Mini EV",
+      "Bingo",
+      "Air EV",
+      "Almaz",
+      "Cortez"
+    ],
+    "price_range_inr": {
+      "min": 300000,
+      "max": 2500000
+    }
+  },
+  "Polestar": {
+    "models": [
+      "Polestar 1",
+      "Polestar 2",
+      "Polestar 3",
+      "Polestar 4",
+      "Polestar 5"
+    ],
+    "price_range_inr": {
+      "min": 3000000,
+      "max": 12000000
+    }
+  },
+  "Genesis": {
+    "models": [
+      "G70",
+      "G80",
+      "G90",
+      "GV60",
+      "GV70",
+      "GV80"
+    ],
+    "price_range_inr": {
+      "min": 3000000,
+      "max": 10000000
+    }
+  },
+  "Suzuki (Global Models)": {
+    "models": [
+      "Swift Sport",
+      "Vitara",
+      "Vitara Brezza (Global)",
+      "Across",
+      "S-Cross",
+      "Ciaz",
+      "Jimny",
+      "SX4",
+      "XL7",
+      "Kizashi"
+    ],
+    "price_range_inr": {
+      "min": 300000,
+      "max": 3000000
+    }
+  },
+  "Subaru": {
+    "models": [
+      "Impreza",
+      "WRX",
+      "WRX STI",
+      "BRZ",
+      "Legacy",
+      "Outback",
+      "Forester",
+      "Crosstrek (XV)",
+      "Ascent",
+      "Solterra"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 8000000
+    }
+  },
+  "Mazda": {
+    "models": [
+      "Mazda2",
+      "Mazda3",
+      "Mazda6",
+      "MX-5 Miata",
+      "RX-7",
+      "RX-8",
+      "CX-3",
+      "CX-5",
+      "CX-30",
+      "CX-50",
+      "CX-60",
+      "CX-90"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 7000000
+    }
+  },
+  "Infiniti": {
+    "models": [
+      "Q50",
+      "Q60",
+      "QX50",
+      "QX55",
+      "QX60",
+      "QX80"
+    ],
+    "price_range_inr": {
+      "min": 1200000,
+      "max": 12000000
+    }
+  },
+  "Acura": {
+    "models": [
+      "Integra",
+      "TLX",
+      "RLX",
+      "RDX",
+      "MDX",
+      "NSX",
+      "ZDX"
+    ],
+    "price_range_inr": {
+      "min": 1000000,
+      "max": 25000000
+    }
+  },
+  "Alfa Romeo": {
+    "models": [
+      "Giulia",
+      "Stelvio",
+      "Tonale",
+      "Giulietta",
+      "4C",
+      "8C Competizione",
+      "Brera",
+      "MiTo"
+    ],
+    "price_range_inr": {
+      "min": 1500000,
+      "max": 30000000
+    }
+  },
+  "Lancia": {
+    "models": [
+      "Delta Integrale",
+      "Delta",
+      "Ypsilon",
+      "Thema",
+      "Stratos",
+      "Fulvia"
+    ],
+    "price_range_inr": {
+      "min": 800000,
+      "max": 5000000
+    }
+  },
+  "SEAT": {
+    "models": [
+      "Ibiza",
+      "Leon",
+      "Arona",
+      "Ateca",
+      "Tarraco",
+      "Toledo"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 3500000
+    }
+  },
+  "CUPRA": {
+    "models": [
+      "Formentor",
+      "Leon",
+      "Born",
+      "Ateca",
+      "Tavascan",
+      "Terramar"
+    ],
+    "price_range_inr": {
+      "min": 2000000,
+      "max": 5000000
+    }
+  },
+  "Smart": {
+    "models": [
+      "fortwo",
+      "forfour",
+      "#1",
+      "#3",
+      "Roadster"
+    ],
+    "price_range_inr": {
+      "min": 400000,
+      "max": 3500000
+    }
+  },
+  "Koenigsegg": {
+    "models": [
+      "Jesko",
+      "Gemera",
+      "Regera",
+      "Agera RS",
+      "One:1",
+      "CCX",
+      "CCR",
+      "CC850"
+    ],
+    "price_range_inr": {
+      "min": 150000000,
+      "max": 500000000
+    }
+  },
+  "Pagani": {
+    "models": [
+      "Zonda",
+      "Huayra",
+      "Utopia"
+    ],
+    "price_range_inr": {
+      "min": 80000000,
+      "max": 300000000
+    }
+  },
+  "Rimac": {
+    "models": [
+      "Nevera",
+      "Concept One",
+      "Concept S"
+    ],
+    "price_range_inr": {
+      "min": 100000000,
+      "max": 250000000
+    }
+  },
+  "Spyker": {
+    "models": [
+      "C8 Spyder",
+      "C8 Laviolette",
+      "D8 Peking-to-Paris"
+    ],
+    "price_range_inr": {
+      "min": 15000000,
+      "max": 50000000
+    }
+  },
+  "Proton": {
+    "models": [
+      "Saga",
+      "Persona",
+      "Iriz",
+      "X50",
+      "X70",
+      "X90",
+      "Satria",
+      "Waja"
+    ],
+    "price_range_inr": {
+      "min": 200000,
+      "max": 2000000
+    }
+  },
+  "Perodua": {
+    "models": [
+      "Myvi",
+      "Axia",
+      "Bezza",
+      "Alza",
+      "Ativa",
+      "Aruz",
+      "Kancil"
+    ],
+    "price_range_inr": {
+      "min": 150000,
+      "max": 1500000
+    }
+  },
+  "Tata EV": {
+    "models": [
+      "Tiago EV",
+      "Tigor EV",
+      "Punch EV",
+      "Nexon EV",
+      "Curvv EV",
+      "Harrier EV",
+      "Sierra EV",
+      "Avinya"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 3500000
+    }
+  },
+  "Abarth": {
+    "models": [
+      "Punto Abarth",
+      "595",
+      "695",
+      "124 Spider"
+    ],
+    "price_range_inr": {
+      "min": 600000,
+      "max": 8000000
+    }
+  },
+  "Scion": {
+    "models": [
+      "tC",
+      "xB",
+      "xA",
+      "FR-S",
+      "iQ"
+    ],
+    "price_range_inr": {
+      "min": 400000,
+      "max": 2500000
+    }
+  },
+  "Saturn": {
+    "models": [
+      "Ion",
+      "Aura",
+      "Sky",
+      "Vue",
+      "Outlook"
+    ],
+    "price_range_inr": {
+      "min": 200000,
+      "max": 1500000
+    }
+  },
+  "Plymouth": {
+    "models": [
+      "Barracuda",
+      "Road Runner",
+      "GTX",
+      "Fury",
+      "Prowler"
+    ],
+    "price_range_inr": {
+      "min": 500000,
+      "max": 15000000
+    }
+  },
+  "Saab": {
+    "models": [
+      "9-3",
+      "9-5",
+      "900",
+      "9000",
+      "9-7X"
+    ],
+    "price_range_inr": {
+      "min": 300000,
+      "max": 3000000
+    }
+  },
+  "TVR": {
+    "models": [
+      "Griffith",
+      "Cerbera",
+      "Chimaera",
+      "Tuscan",
+      "Sagaris"
+    ],
+    "price_range_inr": {
+      "min": 3000000,
+      "max": 12000000
+    }
+  },
+  "Morgan": {
+    "models": [
+      "Plus Four",
+      "Plus Six",
+      "Aero 8",
+      "3 Wheeler",
+      "Super 3"
+    ],
+    "price_range_inr": {
+      "min": 4000000,
+      "max": 15000000
+    }
+  },
+  "Noble": {
+    "models": [
+      "M12",
+      "M400",
+      "M500",
+      "M600"
+    ],
+    "price_range_inr": {
+      "min": 8000000,
+      "max": 40000000
+    }
+  },
+  "Fisker": {
+    "models": [
+      "Ocean",
+      "Pear",
+      "Ronin",
+      "Alaska",
+      "Karma"
+    ],
+    "price_range_inr": {
+      "min": 1500000,
+      "max": 12000000
+    }
+  }
+}

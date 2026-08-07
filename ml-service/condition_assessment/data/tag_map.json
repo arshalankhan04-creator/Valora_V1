@@ -1,0 +1,34 @@
+{
+  "dent_rear_bumper": {
+    "damage_type": "dent",
+    "part": "rear_bumper"
+  },
+  "dent_door": {
+    "damage_type": "dent",
+    "part": "door"
+  },
+  "dent_front_bumper": {
+    "damage_type": "dent",
+    "part": "front_bumper"
+  },
+  "scratch_door": {
+    "damage_type": "scratch",
+    "part": "door"
+  },
+  "scratch_rear_bumper": {
+    "damage_type": "scratch",
+    "part": "rear_bumper"
+  },
+  "scratch_front_bumper": {
+    "damage_type": "scratch",
+    "part": "front_bumper"
+  },
+  "broken_front_headlight": {
+    "damage_type": "broken",
+    "part": "front_headlight"
+  },
+  "broken_windshield": {
+    "damage_type": "broken",
+    "part": "windshield"
+  }
+}
